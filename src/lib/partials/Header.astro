@@ -1,0 +1,20 @@
+---
+import Dropdown from "../components/Dropdown.svelte";
+const user = Astro.locals.user;
+---
+
+<header
+  class="fixed top-0 left-56 right-0 h-11
+  bg-white flex items-center px-4">
+  <Dropdown client:load class="ml-auto">
+    <div class="rounded-full size-8 bg-red-500" slot="trigger">
+      <img src={user?.picture} alt="" />
+    </div>
+
+    <nav
+      slot="content"
+      class="py-2 px-4 rounded-md w-40 text-sm bg-white shadow mt-1">
+      <a href="/logout">Logout</a>
+    </nav>
+  </Dropdown>
+</header>

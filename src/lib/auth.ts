@@ -18,7 +18,8 @@ export const initLucia = (db: D1Database) => {
     getUserAttributes: (attributes) => {
       return {
         name: attributes.name,
-        google_id: attributes.id,
+        email: attributes.email,
+        picture: attributes.picture,
       };
     },
   });
@@ -39,6 +40,7 @@ declare module "lucia" {
   interface DatabaseUserAttributes {
     id: string;
     name: string;
+    picture: string;
     email: string;
     social_id: string;
     network: string;

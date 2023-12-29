@@ -1,0 +1,19 @@
+---
+interface Props {
+  isActive: (href: string) => boolean;
+  href: string;
+}
+
+const { isActive, href } = Astro.props;
+---
+
+<a
+  href={href}
+  class={`flex items-center gap-2 py-2.5 px-3.5 rounded-md
+  ${
+    isActive(href)
+      ? " text-white bg-violet-600"
+      : "text-gray-500/80 hover:bg-gray-100"
+  }`}>
+  <slot />
+</a>

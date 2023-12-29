@@ -1,0 +1,22 @@
+---
+import Header from "../lib/partials/Header.astro";
+import Sidebar from "../lib/partials/Sidebar.astro";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<BaseLayout title={title}>
+  <main class="relative bg-violet-50/80">
+    <Header />
+    <Sidebar />
+
+    <div class="ml-56 mt-10 min-h-screen">
+      <slot />
+    </div>
+  </main>
+</BaseLayout>

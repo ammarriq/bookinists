@@ -1,5 +1,5 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Icon } from "astro-icon/components";
 
 if (Astro.locals.user) {
@@ -7,7 +7,7 @@ if (Astro.locals.user) {
 }
 ---
 
-<Layout title="Login | Bookinists">
+<BaseLayout title="Login | Bookinists">
   <main class="flex flex-col gap-8 justify-center items-center min-h-screen">
     <a href="/" class="space-y-3">
       <Icon name="tabler:books" class="size-8 mx-auto" />
@@ -22,4 +22,4 @@ if (Astro.locals.user) {
        Sign in with Google
     </a>
   </main>
-</Layout>
+</BaseLayout>
