@@ -1,0 +1,49 @@
+import { Lucia } from "lucia";
+import { D1Adapter } from "@lucia-auth/adapter-sqlite";
+import { Google } from "arctic";
+import type { D1Database } from "@cloudflare/workers-types";
+
+export const initLucia = (db: D1Database) => {
+  const adapter = new D1Adapter(db, {
+    user: "users",
+    session: "sessions",
+  });
+
+  return new Lucia(adapter, {
+    sessionCookie: {
+      attributes: {
+        secure: import.meta.env.PROD,
+      },
+    },
+    getUserAttributes: (attributes) => {
+      return {
+        name: attributes.name,
+        google_id: attributes.id,
+      };
+    },
+  });
+};
+
+export const initGoogleAuth = () =>
+  new Google(
+    import.meta.env.GOOGLE_CLIENT_ID,
+    import.meta.env.GOOGLE_CLIENT_SECRET,
+    import.meta.env.GOOGLE_REDIRECT_URI
+  );
+
+declare module "lucia" {
+  interface Register {
+    Lucia: ReturnType<typeof initLucia>;
+  }
+
+  interface DatabaseUserAttributes {
+    id: string;
+    name: string;
+    email: string;
+    social_id: string;
+    network: string;
+    last_login: string;
+    last_ip: string;
+    last_country: string;
+  }
+}

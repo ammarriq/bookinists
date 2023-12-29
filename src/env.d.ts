@@ -1,3 +1,4 @@
+/// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
 // Depending on your adapter mode
@@ -10,5 +11,8 @@ type ENV = {
 
 type Runtime = import("@astrojs/cloudflare").AdvancedRuntime<ENV>;
 declare namespace App {
-  interface Locals extends Runtime {}
+  interface Locals extends Runtime {
+    session: import("lucia").Session | null;
+    user: import("lucia").User | null;
+  }
 }

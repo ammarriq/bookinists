@@ -1,0 +1,9 @@
+---
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/login");
+}
+---
+
+{JSON.stringify(user, null, 2)}
+ Admin route
