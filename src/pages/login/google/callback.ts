@@ -1,43 +1,43 @@
-import type { APIContext } from "astro";
-import type { D1Result } from "@cloudflare/workers-types";
+import type { APIContext } from 'astro'
+import type { D1Result } from '@cloudflare/workers-types'
 
-import { generateId, type DatabaseUserAttributes } from "lucia";
-import { OAuth2RequestError } from "arctic";
-import { initGoogleAuth, initLucia } from "../../../lib/auth";
+import { generateId, type DatabaseUserAttributes } from 'lucia'
+import { OAuth2RequestError } from 'arctic'
+import { initGoogleAuth, initLucia } from '@/lib/auth'
 
 export const GET = async (context: APIContext) => {
-  const { locals, url, cookies, clientAddress, redirect } = context;
-  const db = locals.runtime.env.SITE_DB;
+  const { locals, url, cookies, clientAddress, redirect } = context
+  const db = locals.runtime.env.SITE_DB
 
-  const lucia = initLucia(db);
-  const google = initGoogleAuth();
+  const lucia = initLucia(db)
+  const google = initGoogleAuth()
 
-  const code = url.searchParams.get("code");
-  const state = url.searchParams.get("state");
+  const code = url.searchParams.get('code')
+  const state = url.searchParams.get('state')
 
-  const storedState = cookies.get("google_state")?.value ?? null;
-  const codeVerifier = cookies.get("google_code_verifier")?.value ?? null;
+  const storedState = cookies.get('google_state')?.value ?? null
+  const codeVerifier = cookies.get('google_code_verifier')?.value ?? null
 
   if (!code || !storedState || !codeVerifier || state !== storedState) {
-    return new Response(null, { status: 400 });
+    return new Response(null, { status: 400 })
   }
 
   try {
-    const tokens = await google.validateAuthorizationCode(code, codeVerifier);
-    const googleUser = await getGoogleUser(tokens.accessToken);
+    const tokens = await google.validateAuthorizationCode(code, codeVerifier)
+    const googleUser = await getGoogleUser(tokens.accessToken)
 
     const { results } = (await db
       .prepare(`SELECT * FROM users WHERE email = ?`)
       .bind(googleUser.email)
-      .run()) as D1Result<DatabaseUserAttributes>;
+      .run()) as D1Result<DatabaseUserAttributes>
 
-    const user = results[0];
-    if (user && user?.network !== "google") {
-      const err = "User linked with another provider";
-      return redirect(`/login?error=${encodeURIComponent(err)}`);
+    const user = results[0]
+    if (user && user?.network !== 'google') {
+      const err = 'User linked with another provider'
+      return redirect(`/login?error=${encodeURIComponent(err)}`)
     }
 
-    const userId = user?.id ?? generateId(15);
+    const userId = user?.id ?? generateId(15)
     if (!user) {
       await db
         .prepare(
@@ -51,49 +51,49 @@ export const GET = async (context: APIContext) => {
           googleUser.picture,
           googleUser.email,
           googleUser.sub,
-          "google",
+          'google',
           clientAddress
         )
-        .run();
+        .run()
     } else {
       await db
         .prepare(`UPDATE users SET last_ip = ? WHERE id = ?`)
         .bind(clientAddress, userId)
-        .run();
+        .run()
     }
 
-    const session = await lucia.createSession(userId, {});
-    const { name, value, attributes } = lucia.createSessionCookie(session.id);
-    cookies.set(name, value, attributes);
+    const session = await lucia.createSession(userId, {})
+    const { name, value, attributes } = lucia.createSessionCookie(session.id)
+    cookies.set(name, value, attributes)
 
-    return redirect("/admin");
+    return redirect('/admin')
   } catch (e) {
-    if ((e as OAuth2RequestError).message === "bad_verification_code") {
-      return new Response(null, { status: 400 });
+    if ((e as OAuth2RequestError).message === 'bad_verification_code') {
+      return new Response(null, { status: 400 })
     }
 
-    return new Response(null, { status: 500 });
+    return new Response(null, { status: 500 })
   }
-};
+}
 
 const getGoogleUser = async (accessToken: string) => {
   const options = {
     headers: { Authorization: `Bearer ${accessToken}` },
-  };
+  }
 
-  const res = await fetch(import.meta.env.GOOGLE_USER_URL, options);
-  const user = (await res.json()) as User;
+  const res = await fetch(import.meta.env.GOOGLE_USER_URL, options)
+  const user = (await res.json()) as User
 
-  return user;
-};
+  return user
+}
 
 interface User {
-  sub: string;
-  name: string;
-  given_name: string;
-  family_name: string;
-  picture: string;
-  email: string;
-  email_verified: string;
-  locale: string;
+  sub: string
+  name: string
+  given_name: string
+  family_name: string
+  picture: string
+  email: string
+  email_verified: string
+  locale: string
 }

@@ -1,7 +1,7 @@
+import type { D1Database } from "@cloudflare/workers-types";
 import { Lucia } from "lucia";
 import { D1Adapter } from "@lucia-auth/adapter-sqlite";
 import { Google } from "arctic";
-import type { D1Database } from "@cloudflare/workers-types";
 
 export const initLucia = (db: D1Database) => {
   const adapter = new D1Adapter(db, {
@@ -37,15 +37,17 @@ declare module "lucia" {
     Lucia: ReturnType<typeof initLucia>;
   }
 
-  interface DatabaseUserAttributes {
-    id: string;
-    name: string;
-    picture: string;
-    email: string;
-    social_id: string;
-    network: string;
-    last_login: string;
-    last_ip: string;
-    last_country: string;
-  }
+  interface DatabaseUserAttributes extends User {}
+}
+
+export interface User {
+  id: string;
+  name: string;
+  picture: string;
+  email: string;
+  social_id: string;
+  network: string;
+  last_login: string;
+  last_ip: string;
+  last_country: string;
 }

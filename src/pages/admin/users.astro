@@ -1,9 +1,9 @@
 ---
-import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminLayout from '@/layouts/AdminLayout.astro'
 
-const user = Astro.locals.user;
+const user = Astro.locals.user
 if (!user) {
-  return Astro.redirect("/login");
+  return Astro.redirect('/login')
 }
 ---
 

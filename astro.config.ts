@@ -12,11 +12,12 @@ export default defineConfig({
   adapter: cloudflare({
     runtime: {
       mode: "local",
+      type: "pages",
       bindings: {
         SITE_DB: {
-          type: "d1"
-        }
-      }
-    }
-  })
+          type: "d1",
+        },
+      },
+    },
+  }),
 });
