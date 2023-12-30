@@ -1,13 +1,18 @@
 <script lang="ts">
-  import Link from '../components/Link.svelte'
+  import { getTranslation, type Locales } from '@/i18n/ui'
+  import Link from '@/lib/components/Link.svelte'
 
   type $$Props = {
     pathname: string
+    currentLocale: Locales
   }
 
   export let pathname: $$Props['pathname']
+  export let currentLocale: $$Props['currentLocale']
 
   let isOpen = false
+
+  const t = getTranslation(currentLocale)
 </script>
 
 <button
@@ -28,17 +33,23 @@
   </a>
 
   <nav class="grid gap-2 mt-6">
-    <Link href="/admin" isActive={(href) => pathname === href}>
+    <Link href="/{currentLocale}/admin" isActive={(href) => pathname === href}>
       <i class="icon-[tabler--shield-lock]" />
-      <span class="text-xs font-semibold">Admin</span>
+      <span class="text-xs font-semibold">{t('admin.nav.admin')}</span>
     </Link>
-    <Link href="/admin/users" isActive={(href) => pathname === href}>
+    <Link
+      href="/{currentLocale}/admin/users"
+      isActive={(href) => pathname === href}
+    >
       <i class="icon-[tabler--users]" />
-      <span class="text-xs font-semibold">Users</span>
+      <span class="text-xs font-semibold">{t('admin.nav.users')}</span>
     </Link>
-    <Link href="/admin/books" isActive={(href) => pathname === href}>
+    <Link
+      href="/{currentLocale}/admin/books"
+      isActive={(href) => pathname === href}
+    >
       <i class="icon-[tabler--book-2]" />
-      <span class="text-xs font-semibold">Books</span>
+      <span class="text-xs font-semibold">{t('admin.nav.books')}</span>
     </Link>
   </nav>
 </aside>

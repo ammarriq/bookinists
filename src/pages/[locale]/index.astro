@@ -7,7 +7,6 @@ const result = await db.prepare('SELECT *  FROM users').all()
 
 <BaseLayout title="Welcome to Astro.">
   <main>
-    {JSON.stringify(db, null, 2)}
     {JSON.stringify(result, null, 2)}
   </main>
 </BaseLayout>

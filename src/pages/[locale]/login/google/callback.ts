@@ -6,15 +6,14 @@ import { OAuth2RequestError } from 'arctic'
 import { initGoogleAuth, initLucia } from '@/lib/auth'
 
 export const GET = async (context: APIContext) => {
-  const { locals, url, cookies, clientAddress, redirect } = context
-  const db = locals.runtime.env.SITE_DB
+  const { url, cookies, clientAddress, currentLocale, redirect } = context
+  const db = context.locals.runtime.env.SITE_DB
 
   const lucia = initLucia(db)
   const google = initGoogleAuth()
 
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')
-
   const storedState = cookies.get('google_state')?.value ?? null
   const codeVerifier = cookies.get('google_code_verifier')?.value ?? null
 
@@ -33,8 +32,8 @@ export const GET = async (context: APIContext) => {
 
     const user = results[0]
     if (user && user?.network !== 'google') {
-      const err = 'User linked with another provider'
-      return redirect(`/login?error=${encodeURIComponent(err)}`)
+      const url = `login?error=User%20linked%20with%20another%20provider`
+      return redirect(`/${currentLocale}/${url}`)
     }
 
     const userId = user?.id ?? generateId(15)
@@ -66,7 +65,7 @@ export const GET = async (context: APIContext) => {
     const { name, value, attributes } = lucia.createSessionCookie(session.id)
     cookies.set(name, value, attributes)
 
-    return redirect('/admin')
+    return redirect(`/${currentLocale}/admin`)
   } catch (e) {
     if ((e as OAuth2RequestError).message === 'bad_verification_code') {
       return new Response(null, { status: 400 })
