@@ -9,11 +9,6 @@ import { defaultLang, languages } from './src/i18n/ui'
 export default defineConfig({
   integrations: [svelte(), tailwind()],
   output: 'server',
-  i18n: {
-    defaultLocale: defaultLang,
-    locales: languages,
-    routing: { prefixDefaultLocale: true, strategy: 'pathname' },
-  },
   adapter: cloudflare({
     runtime: {
       mode: 'local',

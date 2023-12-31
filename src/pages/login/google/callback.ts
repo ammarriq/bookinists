@@ -6,7 +6,7 @@ import { OAuth2RequestError } from 'arctic'
 import { initGoogleAuth, initLucia } from '@/lib/auth'
 
 export const GET = async (context: APIContext) => {
-  const { url, cookies, clientAddress, currentLocale, redirect } = context
+  const { url, cookies, clientAddress, redirect } = context
   const db = context.locals.runtime.env.SITE_DB
 
   const lucia = initLucia(db)
@@ -33,7 +33,7 @@ export const GET = async (context: APIContext) => {
     const user = results[0]
     if (user && user?.network !== 'google') {
       const url = `login?error=User%20linked%20with%20another%20provider`
-      return redirect(`/${currentLocale}/${url}`)
+      return redirect(`/${url}`)
     }
 
     const userId = user?.id ?? generateId(15)
@@ -65,7 +65,7 @@ export const GET = async (context: APIContext) => {
     const { name, value, attributes } = lucia.createSessionCookie(session.id)
     cookies.set(name, value, attributes)
 
-    return redirect(`/${currentLocale}/admin`)
+    return redirect(`/admin`)
   } catch (e) {
     if ((e as OAuth2RequestError).message === 'bad_verification_code') {
       return new Response(null, { status: 400 })

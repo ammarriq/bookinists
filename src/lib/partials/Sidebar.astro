@@ -1,11 +1,8 @@
 ---
-import { getTranslation, type Locales } from '@/i18n/ui'
 import Link from '@/lib/components/Link.astro'
 import Navigation from './Sidebar.svelte'
 
 const pathname = Astro.url.pathname
-const lang = Astro.currentLocale
-const t = getTranslation(lang as Locales)
 ---
 
 <Navigation client:load>
@@ -15,17 +12,17 @@ const t = getTranslation(lang as Locales)
   </a>
 
   <nav class="grid gap-2 mt-6">
-    <Link href={`/${lang}/admin`} isActive={(href) => pathname === href}>
+    <Link href={`/admin`} isActive={(href) => pathname === href}>
       <i class="icon-[tabler--shield-lock]"></i>
-      <span class="text-xs font-semibold">{t('admin.nav.admin')}</span>
+      <span class="text-xs font-semibold">Admin</span>
     </Link>
-    <Link href={`/${lang}/admin/users`} isActive={(href) => pathname === href}>
+    <Link href={`/admin/users`} isActive={(href) => pathname === href}>
       <i class="icon-[tabler--users]"></i>
-      <span class="text-xs font-semibold">{t('admin.nav.users')}</span>
+      <span class="text-xs font-semibold">Users</span>
     </Link>
-    <Link href={`/${lang}/admin/books`} isActive={(href) => pathname === href}>
+    <Link href={`/admin/books`} isActive={(href) => pathname === href}>
       <i class="icon-[tabler--book-2]"></i>
-      <span class="text-xs font-semibold">{t('admin.nav.books')}</span>
+      <span class="text-xs font-semibold">Books</span>
     </Link>
   </nav>
 </Navigation>

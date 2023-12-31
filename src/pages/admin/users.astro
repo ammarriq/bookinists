@@ -1,0 +1,34 @@
+---
+import type { User } from '@/lib/auth'
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import UserTable from './_Users.svelte'
+import AddUser from './_AddUser.svelte'
+import { decode } from 'decode-formdata'
+
+const db = Astro.locals.runtime.env.SITE_DB
+const user = Astro.locals.user
+
+if (!user) {
+  return Astro.redirect('/login')
+}
+
+const { results: users } = await db.prepare('SELECT * FROM users').run<User>()
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData()
+  const data = decode(formData)
+}
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <section class="bg-white px-6 py-4 border rounded-md">
+      <hgroup class="flex">
+        <h2 class="font-semibold mr-auto">Users</h2>
+        <AddUser client:load />
+      </hgroup>
+
+      <UserTable users={users} />
+    </section>
+  </main>
+</AdminLayout>

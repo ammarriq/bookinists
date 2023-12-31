@@ -8,7 +8,6 @@ interface Props {
 }
 
 const { title } = Astro.props
-const { url, currentLocale } = Astro
 ---
 
 <BaseLayout title={title}>
@@ -16,7 +15,7 @@ const { url, currentLocale } = Astro
     <Header />
     <Sidebar />
 
-    <div class="ml-0 lg:ml-56 mt-10 min-h-[calc(100vh-2.5rem)]">
+    <div class="pl-0 lg:pl-56 pt-11 min-h-screen">
       <slot />
     </div>
   </main>

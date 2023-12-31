@@ -1,5 +1,5 @@
 import type { APIContext } from 'astro'
-import { generateState, generateCodeVerifier, Google } from 'arctic'
+import { generateState, generateCodeVerifier } from 'arctic'
 import { initGoogleAuth } from '@/lib/auth'
 
 export const GET = async ({ cookies, redirect }: APIContext) => {
