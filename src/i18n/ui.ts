@@ -6,6 +6,7 @@ const translations = {
     'admin.nav.admin': 'Admin',
     'admin.nav.users': 'Users',
     'admin.nav.books': 'Books',
+    'admin.header.nav.logout': 'Logout',
   },
 } as const
 

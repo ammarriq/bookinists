@@ -1,19 +1,16 @@
-<script lang="ts">
-  import type { User } from '@/lib/auth'
-  import Dropdown from '@/lib/components/Dropdown.svelte'
+---
+import { getTranslation, type Locales } from '@/i18n/ui'
+import Dropdown from '@/lib/components/Dropdown.svelte'
 
-  type $$Props = {
-    user: Pick<User, 'id' | 'email' | 'name' | 'picture'>
-  }
-
-  export let user: $$Props['user']
-</script>
+const user = Astro.locals.user
+const t = getTranslation(Astro.currentLocale as Locales)
+---
 
 <header
   class="fixed top-0 left-0 lg:left-56 right-0
   bg-white flex items-center px-4 h-11"
 >
-  <Dropdown class="ml-auto">
+  <Dropdown client:load class="ml-auto">
     <div class="rounded-full size-8 bg-red-500" slot="trigger">
       <img src={user?.picture} alt="" />
     </div>
@@ -27,7 +24,7 @@
           type="submit"
           class="text-left w-full hover:bg-gray-100 px-2 py-1 rounded-md"
         >
-          Logout
+          {t('admin.header.nav.logout')}
         </button>
       </form>
     </nav>

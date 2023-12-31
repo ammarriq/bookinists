@@ -1,6 +1,6 @@
 ---
-import Header from '@/lib/partials/Header.svelte'
-import Sidebar from '@/lib/partials/Sidebar.svelte'
+import Header from '@/lib/partials/Header.astro'
+import Sidebar from '@/lib/partials/Sidebar.astro'
 import BaseLayout from './BaseLayout.astro'
 
 interface Props {
@@ -8,17 +8,13 @@ interface Props {
 }
 
 const { title } = Astro.props
-const { url, locals, currentLocale } = Astro
+const { url, currentLocale } = Astro
 ---
 
 <BaseLayout title={title}>
   <main class="relative bg-violet-50/80">
-    <Header client:load user={locals.user} />
-    <Sidebar
-      client:load
-      pathname={url.pathname}
-      currentLocale={currentLocale}
-    />
+    <Header />
+    <Sidebar />
 
     <div class="ml-0 lg:ml-56 mt-10 min-h-[calc(100vh-2.5rem)]">
       <slot />
