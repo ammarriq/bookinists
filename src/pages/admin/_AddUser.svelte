@@ -8,7 +8,7 @@
 <button
   on:click={() => (dialogOpen = true)}
   class="flex items-center gap-1 text-xs text-white
-  hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2"
+  hover:bg-black/90 bg-black rounded px-4 py-2"
 >
   <i class="icon-[tabler--plus]" />
   <span>Add user</span>
