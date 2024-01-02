@@ -1,5 +1,6 @@
 <script lang="ts">
   import { DropdownMenu as Dropdown } from 'bits-ui'
+  import { fly } from 'svelte/transition'
 
   export let menu: { label: string; url: string; isPost: boolean }[]
   export let picture = ''
@@ -10,7 +11,10 @@
     <img src={picture} alt="" />
   </Dropdown.Trigger>
 
-  <Dropdown.Content class="p-1 rounded-md w-40 text-sm bg-white shadow mt-1">
+  <Dropdown.Content
+    transition={(e) => fly(e, { duration: 150, y: 10 })}
+    class="p-1 rounded-md w-40 text-sm bg-white shadow mt-1"
+  >
     {#each menu as item, i (i)}
       {#if !item.isPost}
         <Dropdown.Item

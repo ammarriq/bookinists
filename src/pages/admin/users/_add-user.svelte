@@ -112,7 +112,8 @@
               <i class="icon-[tabler--selector]" />
             </Select.Trigger>
             <Select.Content
-              class="w-full rounded-md p-1 border bg-white"
+              class="w-full rounded-md p-1 border bg-white shadow-sm"
+              transition={(e) => fly(e, { duration: 150, y: -5 })}
               sideOffset={8}
             >
               {#each ['admin', 'manager'] as role}

@@ -37,7 +37,9 @@
     {/if}
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
-    {dayjs(new Date(user.last_login)).format('MM/DD/YYYY hh:mm A')}
+    {#if user.last_login}
+      {dayjs(new Date(user.last_login)).format('MM/DD/YYYY hh:mm A')}
+    {/if}
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
     {user.last_ip ?? ''}

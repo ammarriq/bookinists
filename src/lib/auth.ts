@@ -48,7 +48,7 @@ export interface User {
   role: string
   social_id?: string
   network?: string
-  last_login: string
+  last_login?: string
   last_ip?: string
   last_country?: string
 }

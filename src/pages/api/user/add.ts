@@ -4,7 +4,7 @@ import { generateId } from 'lucia'
 import { email, flatten, object, picklist, safeParse, string } from 'valibot'
 
 export const POST = (async (context) => {
-  const { locals, request, redirect } = context
+  const { locals, request } = context
   const db = locals.runtime.env.SITE_DB
 
   if (!locals.user) {
@@ -17,6 +17,19 @@ export const POST = (async (context) => {
 
   if (!result.success) {
     const errors = flatten(result.issues).nested
+    return Response.json(
+      { data: null, success: false, errors },
+      { status: 400 }
+    )
+  }
+
+  const { results } = await db
+    .prepare('SELECT * FROM users WHERE email=?')
+    .bind(result.output.email)
+    .run()
+
+  if (results.length) {
+    const errors = { email: ['User with that already exists'] }
     return Response.json(
       { data: null, success: false, errors },
       { status: 400 }
