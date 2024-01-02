@@ -1,7 +1,7 @@
 import type { APIContext } from 'astro'
 import type { D1Result } from '@cloudflare/workers-types'
+import type { DatabaseUserAttributes } from 'lucia'
 
-import { generateId, type DatabaseUserAttributes } from 'lucia'
 import { OAuth2RequestError } from 'arctic'
 import { initGoogleAuth, initLucia } from '@/lib/auth'
 
@@ -31,37 +31,31 @@ export const GET = async (context: APIContext) => {
       .run()) as D1Result<DatabaseUserAttributes>
 
     const user = results[0]
-    if (user && user?.network !== 'google') {
-      const url = `login?error=User%20linked%20with%20another%20provider`
-      return redirect(`/${url}`)
+
+    if (!user) {
+      return redirect('/login?error=You+are+not+registered')
     }
 
-    const userId = user?.id ?? generateId(15)
-    if (!user) {
+    if (user.network && user.network !== 'google') {
+      return redirect('login?error=Linked+with+another+provider')
+    }
+
+    if (!user.network) {
+      const { name, picture, sub } = googleUser
       await db
         .prepare(
-          `INSERT INTO users
-          (id, name, picture, email, social_id, network, last_ip)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`
+          `UPDATE users SET name=?, picture=?, social_id=?, network=? WHERE id=?`
         )
-        .bind(
-          userId,
-          googleUser.name,
-          googleUser.picture,
-          googleUser.email,
-          googleUser.sub,
-          'google',
-          clientAddress
-        )
-        .run()
-    } else {
-      await db
-        .prepare(`UPDATE users SET last_ip = ? WHERE id = ?`)
-        .bind(clientAddress, userId)
+        .bind(name, picture, sub, 'google', user.id)
         .run()
     }
 
-    const session = await lucia.createSession(userId, {})
+    await db
+      .prepare(`UPDATE users SET last_ip=?, last_login=? WHERE id=?`)
+      .bind(clientAddress, Date.now(), user.id)
+      .run()
+
+    const session = await lucia.createSession(user.id, {})
     const { name, value, attributes } = lucia.createSessionCookie(session.id)
     cookies.set(name, value, attributes)
 
@@ -70,6 +64,7 @@ export const GET = async (context: APIContext) => {
     if ((e as OAuth2RequestError).message === 'bad_verification_code') {
       return new Response(null, { status: 400 })
     }
+    console.log(e)
 
     return new Response(null, { status: 500 })
   }
@@ -86,7 +81,7 @@ const getGoogleUser = async (accessToken: string) => {
   return user
 }
 
-interface User {
+type User = {
   sub: string
   name: string
   given_name: string

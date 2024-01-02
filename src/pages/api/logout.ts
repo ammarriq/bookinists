@@ -1,7 +1,7 @@
-import type { APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 import { initLucia } from '@/lib/auth'
 
-export async function POST(context: APIContext): Promise<Response> {
+export const POST = (async (context) => {
   const { locals, cookies, redirect } = context
   const lucia = initLucia(locals.runtime.env.SITE_DB)
 
@@ -15,4 +15,4 @@ export async function POST(context: APIContext): Promise<Response> {
   cookies.set(name, value, attributes)
 
   return redirect(`/login`)
-}
+}) satisfies APIRoute

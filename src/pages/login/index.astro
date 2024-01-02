@@ -4,6 +4,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 if (Astro.locals.user) {
   return Astro.redirect('/admin')
 }
+
+const error = Astro.url.searchParams.get('error')
 ---
 
 <BaseLayout title="Login | Bookinists">
@@ -13,13 +15,27 @@ if (Astro.locals.user) {
       <h1 class="text-2xl font-bold text-center">Bookinists</h1>
     </a>
 
-    <a
-      href="/login/google"
-      class="flex items-center justify-center gap-2 max-w-xs w-full
-      border rounded text-center text-sm font-medium py-2"
-    >
-      <img src="/icons/google.svg" class="size-4" alt="Google" />
-       Sign in with Google
-    </a>
+    <div class="max-w-xs w-full space-y-2">
+      <a
+        href="/login/google"
+        class="flex items-center justify-center gap-2 w-full
+        border rounded text-center text-sm font-medium py-2"
+      >
+        <img src="/icons/google.svg" class="size-4" alt="Google" />
+         Sign in with Google
+      </a>
+
+      {
+        error ? (
+          <div
+            class="text-red-500 text-center text-xs
+            flex gap-2 items-center justify-center"
+          >
+            <i class="icon-[tabler--exclamation-circle]" />
+            <p>{error}</p>
+          </div>
+        ) : null
+      }
+    </div>
   </main>
 </BaseLayout>
