@@ -4,43 +4,77 @@
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
-  import { Dialog, Select } from 'bits-ui'
+  import { Dialog, Select, DropdownMenu as Dropdown } from 'bits-ui'
+
+  export let id: string
+  export let email: string
+  export let role: string
 
   let dialogOpen = false
   let errors: Record<string, string[]> = {}
 
-  const dispatch = createEventDispatcher<{ submit: User }>()
+  const dispatch = createEventDispatcher<{ edit: User; delete: string }>()
 
-  const submit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const editUser: FormEventHandler<HTMLFormElement> = async (e) => {
     const form = e.currentTarget
     const formData = new FormData(form)
 
     const res = await fetch(form.action, {
-      method: form.method,
+      method: 'PUT',
       body: formData,
     })
 
-    const json = (await res.json()) as {
-      data: User
-      success: boolean
-      errors: typeof errors
-    }
-
+    const json = (await res.json()) as FetchResponse<User>
     if (!json.success) return (errors = json.errors)
 
-    dispatch('submit', json.data)
     dialogOpen = false
+    dispatch('edit', json.data)
   }
+
+  const deleteUser = async () => {
+    if (!confirm('Are you sure you wanna delete the user?')) return
+
+    const res = await fetch('/api/user', {
+      method: 'DELETE',
+      body: id,
+    })
+
+    const json = (await res.json()) as FetchResponse<User>
+    if (!json.success) return (errors = json.errors)
+
+    dispatch('delete', id)
+  }
+
+  const roles = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'manager', label: 'Manager' },
+  ]
 </script>
 
-<button
-  on:click={() => (dialogOpen = true)}
-  class="flex items-center gap-1 text-xs text-white
-  hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2"
->
-  <i class="icon-[tabler--plus]" />
-  <span>Add user</span>
-</button>
+<Dropdown.Root>
+  <Dropdown.Trigger class="size-5">
+    <i class="icon-[tabler--dots-vertical] text-violet-600 size-5" />
+  </Dropdown.Trigger>
+
+  <Dropdown.Content
+    transition={(e) => fly(e, { duration: 150, y: 10 })}
+    align="end"
+    class="p-1 rounded-md w-40 text-xs bg-white shadow mt-1"
+  >
+    <Dropdown.Item
+      class="text-left w-full px-3 py-1.5 rounded-md hover:bg-gray-100"
+      on:click={() => (dialogOpen = true)}
+    >
+      Edit
+    </Dropdown.Item>
+    <Dropdown.Item
+      class="text-left w-full px-3 py-1.5 rounded-md hover:bg-gray-100"
+      on:click={deleteUser}
+    >
+      Delete
+    </Dropdown.Item>
+  </Dropdown.Content>
+</Dropdown.Root>
 
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Portal>
@@ -66,8 +100,9 @@
         </p>
       </Dialog.Title>
 
-      <form action="/api/user" method="post" on:submit|preventDefault={submit}>
+      <form action="/api/user" on:submit|preventDefault={editUser}>
         <label for="email" class="text-sm font-medium"> Email </label>
+        <input type="hidden" name="id" value={id} />
         <div class="relative w-full mt-0.5">
           {#if !!errors.email}
             <small class="text-xs absolute top-full left-0 text-red-500">
@@ -75,16 +110,18 @@
             </small>
           {/if}
           <input
+            disabled
             type="email"
             id="email"
             name="email"
-            class="border w-full px-3 py-1.5 rounded-md text-sm
-            shadow-sm focus:outline-violet-600"
+            value={email}
+            class="border w-full px-3 py-1.5 rounded-md
+            text-sm focus:outline-violet-600"
             class:border-red-500={!!errors.email}
           />
         </div>
 
-        <div class="flex gap-4 items-center justify-between mt-4">
+        <div class="flex gap-4 roles-center justify-between mt-4">
           <span class="text-sm font-medium">Role</span>
         </div>
 
@@ -94,7 +131,7 @@
               {errors.role}
             </small>
           {/if}
-          <Select.Root>
+          <Select.Root selected={roles.find((o) => o.value === role)}>
             <Select.Trigger
               class="flex items-center justify-between border w-full px-3
               py-1.5 rounded-md text-sm shadow-sm focus:outline-violet-600
@@ -113,13 +150,13 @@
               transition={(e) => fly(e, { duration: 150, y: -5 })}
               sideOffset={8}
             >
-              {#each ['admin', 'manager'] as role}
+              {#each roles as role}
                 <Select.Item
                   class="px-2 py-1 text-sm capitalize rounded-md cursor-default hover:bg-gray-100"
-                  value={role}
-                  label={role}
+                  value={role.value}
+                  label={role.label}
                 >
-                  {role}
+                  {role.label}
                 </Select.Item>
               {/each}
             </Select.Content>
@@ -128,7 +165,7 @@
         </div>
 
         <button
-          class="flex items-center gap-1 text-xs text-white ml-auto
+          class="flex roles-center gap-1 text-xs text-white ml-auto
           hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2 mt-8"
         >
           <i class="icon-[tabler--plus]"></i>

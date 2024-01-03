@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { User } from '@/lib/auth'
+
   import AddUser from './_add-user.svelte'
   import UserRow from './_user-row.svelte'
 
@@ -25,12 +26,23 @@
           <th class="py-2.5 px-4 whitespace-nowrap">Role</th>
           <th class="py-2.5 px-4 whitespace-nowrap">Network</th>
           <th class="py-2.5 px-4 whitespace-nowrap">Last login</th>
-          <th class="py-2.5 px-4 rounded-r-lg whitespace-nowrap">Last ip</th>
+          <th class="py-2.5 px-4 whitespace-nowrap">Last ip</th>
+          <th class="py-2.5 px-4 rounded-r-lg whitespace-nowrap">Actions</th>
         </tr>
       </thead>
       <tbody>
         {#each userList as user (user.id)}
-          <UserRow {user} />
+          <UserRow
+            {user}
+            on:edit={(e) => {
+              const userIdx = userList.findIndex((o) => o.id === e.detail.id)
+              const user = { ...userList[userIdx], ...e.detail }
+              userList[userIdx] = user
+            }}
+            on:delete={(e) => {
+              userList = userList.filter((o) => o.id !== e.detail)
+            }}
+          />
         {/each}
       </tbody>
     </table>

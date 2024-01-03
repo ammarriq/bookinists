@@ -9,6 +9,6 @@ if (!user) {
 ---
 
 <AdminLayout title="Admin | Bookinists">
-  {JSON.stringify({ name: user.name, email: user.email }, null, 2)}
+  {JSON.stringify({ email: user.email, role: user.role }, null, 2)}
    Admin route
 </AdminLayout>

@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { User } from '@/lib/auth'
+
+  import { createEventDispatcher } from 'svelte'
   import { Avatar } from 'bits-ui'
   import dayjs from 'dayjs'
+  import UserActions from './_user-actions.svelte'
 
   export let user: User
 
@@ -43,5 +46,14 @@
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
     {user.last_ip ?? ''}
+  </td>
+  <td class="py-2.5 px-4 text-right whitespace-nowrap">
+    <UserActions
+      id={user.id}
+      email={user.email}
+      role={user.role}
+      on:delete
+      on:edit
+    />
   </td>
 </tr>

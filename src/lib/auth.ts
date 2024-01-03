@@ -18,8 +18,9 @@ export const initLucia = (db: D1Database) => {
     getUserAttributes: (attributes) => {
       return {
         name: attributes.name,
-        email: attributes.email,
         picture: attributes.picture,
+        email: attributes.email,
+        role: attributes.role,
       }
     },
   })
