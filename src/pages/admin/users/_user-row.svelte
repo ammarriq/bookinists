@@ -13,7 +13,7 @@
   }
 </script>
 
-<tr class="text-xs border-b">
+<tr class="text-sm border-b">
   <td class="py-2.5 px-4 whitespace-nowrap">
     <div class="flex gap-2 items-center min-w-max">
       <Avatar.Root class="flex size-8 items-center justify-center rounded-full">

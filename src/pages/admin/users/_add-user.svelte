@@ -35,7 +35,7 @@
 
 <button
   on:click={() => (dialogOpen = true)}
-  class="flex items-center gap-1 text-xs text-white
+  class="flex items-center gap-1 text-sm text-white
   hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2"
 >
   <i class="icon-[tabler--plus]" />
@@ -59,7 +59,7 @@
         on:click={() => (dialogOpen = false)}
       />
 
-      <Dialog.Title class="space-y-1 mb-6">
+      <Dialog.Title class="space-y-1 mb-4">
         <h2 class="text-base font-semibold">Add User</h2>
         <p class="text-sm text-gray-500/70">
           Provide both name and email to create a new user.
@@ -70,7 +70,7 @@
         <label for="email" class="text-sm font-medium"> Email </label>
         <div class="relative w-full mt-0.5">
           {#if !!errors.email}
-            <small class="text-xs absolute top-full left-0 text-red-500">
+            <small class="text-sm absolute top-full left-0 text-red-500">
               {errors.email}
             </small>
           {/if}
@@ -90,7 +90,7 @@
 
         <div class="relative mt-0.5">
           {#if !!errors.role}
-            <small class="text-xs absolute top-full left-0 text-red-500">
+            <small class="text-sm absolute top-full left-0 text-red-500">
               {errors.role}
             </small>
           {/if}
@@ -128,7 +128,7 @@
         </div>
 
         <button
-          class="flex items-center gap-1 text-xs text-white ml-auto
+          class="flex items-center gap-1 text-sm text-white ml-auto
           hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2 mt-8"
         >
           <i class="icon-[tabler--plus]"></i>

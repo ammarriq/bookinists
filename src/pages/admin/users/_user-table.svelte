@@ -10,7 +10,7 @@
 </script>
 
 <section class="bg-white px-6 py-4 border rounded-md">
-  <hgroup class="flex">
+  <hgroup class="flex items-center">
     <h2 class="font-semibold mr-auto">Users</h2>
     <AddUser on:submit={(e) => (userList = [...userList, e.detail])} />
   </hgroup>
@@ -19,7 +19,7 @@
     <table class="w-full">
       <thead>
         <tr
-          class="text-left text-[0.65rem] tracking-wider
+          class="text-left text-xxs tracking-wider
           uppercase text-gray-500/70 bg-gray-100"
         >
           <th class="py-2.5 px-4 rounded-l-lg whitespace-nowrap">Profile</th>

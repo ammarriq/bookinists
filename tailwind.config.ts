@@ -10,6 +10,11 @@ export default {
         sans: ['InterVariable', 'Inter', ...defaultTheme.fontFamily.sans],
       },
     },
+    fontSize: {
+      ...defaultTheme.fontSize,
+      xxs: '0.6rem',
+      sm: '0.8rem',
+    },
   },
   plugins: [addDynamicIconSelectors()],
 }

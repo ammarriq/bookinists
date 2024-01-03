@@ -14,15 +14,15 @@ const pathname = Astro.url.pathname
   <nav class="grid gap-2 mt-6">
     <Link href={`/admin`} isActive={(href) => pathname === href}>
       <i class="icon-[tabler--shield-lock]"></i>
-      <span class="text-xs font-semibold">Admin</span>
+      <span class="text-sm font-medium">Admin</span>
     </Link>
     <Link href={`/admin/users`} isActive={(href) => pathname === href}>
       <i class="icon-[tabler--users]"></i>
-      <span class="text-xs font-semibold">Users</span>
+      <span class="text-sm font-medium">Users</span>
     </Link>
     <Link href={`/admin/books`} isActive={(href) => pathname === href}>
       <i class="icon-[tabler--book-2]"></i>
-      <span class="text-xs font-semibold">Books</span>
+      <span class="text-sm font-medium">Books</span>
     </Link>
   </nav>
 </Navigation>
