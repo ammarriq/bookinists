@@ -19,7 +19,7 @@
       {#if !item.isPost}
         <Dropdown.Item
           href={item.url}
-          class="text-left w-full px-2 py-1 rounded-md hover:bg-gray-100"
+          class="text-left w-full px-2 py-1 rounded-md hover:bg-slate-100"
         >
           {item.label}
         </Dropdown.Item>
@@ -30,7 +30,7 @@
           <form action={item.url} method="post">
             <button
               type="submit"
-              class="text-left w-full hover:bg-gray-100 px-2 py-1 rounded-md"
+              class="text-left w-full hover:bg-slate-100 px-2 py-1 rounded-md"
             >
               {item.label}
             </button>

@@ -26,8 +26,8 @@
         </Avatar.Fallback>
       </Avatar.Root>
       <div>
-        <p class="font-semibold text-violet-600">{user.name ?? ''}</p>
-        <p class="text-gray-500/70">{user.email}</p>
+        <p class="font-semibold text-slate-900">{user.name ?? ''}</p>
+        <p class="text-slate-500/70">{user.email}</p>
       </div>
     </div>
   </td>

@@ -6,7 +6,8 @@
   import { createEventDispatcher } from 'svelte'
   import { Dialog, Select } from 'bits-ui'
 
-  let dialogOpen = false
+  export let dialogOpen = false
+
   let errors: Record<string, string[]> = {}
 
   const dispatch = createEventDispatcher<{ submit: User }>()
@@ -33,15 +34,6 @@
   }
 </script>
 
-<button
-  on:click={() => (dialogOpen = true)}
-  class="flex items-center gap-1 text-sm text-white
-  hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2"
->
-  <i class="icon-[tabler--plus]" />
-  <span>Add user</span>
-</button>
-
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Portal>
     <Dialog.Overlay
@@ -61,7 +53,7 @@
 
       <Dialog.Title class="space-y-1 mb-4">
         <h2 class="text-base font-semibold">Add User</h2>
-        <p class="text-sm text-gray-500/70">
+        <p class="text-sm text-slate-500/70">
           Provide both name and email to create a new user.
         </p>
       </Dialog.Title>
@@ -79,7 +71,7 @@
             id="email"
             name="email"
             class="border w-full px-3 py-1.5 rounded-md text-sm
-            shadow-sm focus:outline-violet-600"
+            shadow-sm focus:outline-slate-900"
             class:border-red-500={!!errors.email}
           />
         </div>
@@ -97,7 +89,7 @@
           <Select.Root>
             <Select.Trigger
               class="flex items-center justify-between border w-full px-3
-              py-1.5 rounded-md text-sm shadow-sm focus:outline-violet-600
+              py-1.5 rounded-md text-sm shadow-sm focus:outline-slate-900
               {!!errors.role ? 'border-red-500' : ''}"
               aria-label="Select a theme"
             >
@@ -115,7 +107,7 @@
             >
               {#each ['admin', 'manager'] as role}
                 <Select.Item
-                  class="px-2 py-1 text-sm capitalize rounded-md cursor-default hover:bg-gray-100"
+                  class="px-2 py-1 text-sm capitalize rounded-md cursor-default hover:bg-slate-100"
                   value={role}
                   label={role}
                 >
@@ -128,10 +120,9 @@
         </div>
 
         <button
-          class="flex items-center gap-1 text-sm text-white ml-auto
-          hover:bg-violet-600/90 bg-violet-600 rounded px-4 py-2 mt-8"
+          class="flex ml-auto gap-1 text-sm text-white font-medium
+          hover:bg-slate-900/90 bg-slate-900 rounded-md px-4 py-1.5 mt-4"
         >
-          <i class="icon-[tabler--plus]"></i>
           Submit
         </button>
       </form>
