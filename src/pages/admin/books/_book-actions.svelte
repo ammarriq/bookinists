@@ -18,7 +18,7 @@
 
   const dispatch = createEventDispatcher<{ edit: User; delete: string }>()
 
-  const editUser: FormEventHandler<HTMLFormElement> = async (e) => {
+  const editBook: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
 
     const form = e.currentTarget
@@ -37,8 +37,8 @@
     dispatch('edit', json.data)
   }
 
-  const deleteUser = async () => {
-    if (!confirm('Are you sure you wanna delete the user?')) return
+  const deleteBook = async () => {
+    if (!confirm('Are you sure you wanna delete the book?')) return
     submitting = true
 
     const form = deleteForm
@@ -80,11 +80,11 @@
     </Dropdown.Item>
     <Dropdown.Item
       class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-      on:click={deleteUser}
+      on:click={deleteBook}
       disabled={submitting}
     >
       <form
-        action="/api/user?delete"
+        action="/api/book?delete"
         method="post"
         bind:this={deleteForm}
         on:submit|preventDefault
@@ -114,16 +114,16 @@
       />
 
       <Dialog.Title class="space-y-1 mb-4">
-        <h2 class="text-base font-semibold">Edit User</h2>
+        <h2 class="text-base font-semibold">Edit Book</h2>
         <p class="text-sm text-slate-500/70">
-          Provide both name and email to create a new user.
+          Provide both name and email to create a new book.
         </p>
       </Dialog.Title>
 
       <form
-        action="/api/user?edit"
+        action="/api/book?edit"
         method="post"
-        on:submit|preventDefault={editUser}
+        on:submit|preventDefault={editBook}
       >
         <label for="email" class="text-sm font-medium"> Email </label>
         <input type="hidden" name="id" value={id} />

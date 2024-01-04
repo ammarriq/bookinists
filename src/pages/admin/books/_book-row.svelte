@@ -3,9 +3,9 @@
 
   import { Avatar } from 'bits-ui'
   import dayjs from 'dayjs'
-  import UserActions from './_user-actions.svelte'
+  import BookActions from './_book-actions.svelte'
 
-  export let user: User
+  export let book: User
 
   const networks: Record<string, string> = {
     google: '/icons/google.svg',
@@ -16,7 +16,7 @@
   <td class="py-2.5 px-4 whitespace-nowrap">
     <div class="flex gap-2 items-center min-w-max">
       <Avatar.Root class="flex size-8 items-center justify-center rounded-full">
-        <Avatar.Image src={user.picture} alt="@huntabyte" />
+        <Avatar.Image src={book.picture} alt="@huntabyte" />
         <Avatar.Fallback
           class="flex items-center justify-center
           bg-red-600 rounded-full size-8"
@@ -25,32 +25,32 @@
         </Avatar.Fallback>
       </Avatar.Root>
       <div>
-        <p class="font-semibold text-slate-900">{user.name ?? ''}</p>
-        <p class="text-slate-500/70">{user.email}</p>
+        <p class="font-semibold text-slate-900">{book.name ?? ''}</p>
+        <p class="text-slate-500/70">{book.email}</p>
       </div>
     </div>
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap capitalize">
-    {user.role}
+    {book.role}
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap capitalize">
-    {#if user.network}
-      <img class="size-5" src={networks[user.network]} alt={user.network} />
+    {#if book.network}
+      <img class="size-5" src={networks[book.network]} alt={book.network} />
     {/if}
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
-    {#if user.last_login}
-      {dayjs(new Date(user.last_login)).format('MM/DD/YYYY hh:mm A')}
+    {#if book.last_login}
+      {dayjs(new Date(book.last_login)).format('MM/DD/YYYY hh:mm A')}
     {/if}
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
-    {user.last_ip ?? ''}
+    {book.last_ip ?? ''}
   </td>
   <td class="py-2.5 px-4 text-right whitespace-nowrap">
-    <UserActions
-      id={user.id}
-      email={user.email}
-      role={user.role}
+    <BookActions
+      id={book.id}
+      email={book.email}
+      role={book.role}
       on:delete
       on:edit
     />

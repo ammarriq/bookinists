@@ -1,0 +1,17 @@
+---
+import type { User } from '@/lib/auth'
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import BookTable from './_book-table.svelte'
+
+const db = Astro.locals.runtime.env.SITE_DB
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const { results: books } = await db.prepare('SELECT * FROM users').run<User>()
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <BookTable books={books} client:load />
+  </main>
+</AdminLayout>

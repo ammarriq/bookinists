@@ -1,8 +1,23 @@
 ---
-import Link from '@/lib/components/Link.astro'
+import NavItem from '@/lib/partials/NavItem.svelte'
 import Navigation from './Sidebar.svelte'
 
 const pathname = Astro.url.pathname
+
+const navLinks = [
+  { icon: 'icon-[tabler--shield-lock]', label: 'Admin', href: '/admin' },
+  { icon: 'icon-[tabler--users]', label: 'Users', href: '/admin/users' },
+  {
+    icon: 'icon-[tabler--book-2]',
+    label: 'Books',
+    children: [
+      { label: 'Books', href: '/admin/books' },
+      { label: 'Genre', href: '/admin/genre' },
+      { label: 'Collections', href: '/admin/collections' },
+      { label: 'Authors', href: '/admin/authors' },
+    ],
+  },
+]
 ---
 
 <Navigation client:load>
@@ -11,18 +26,38 @@ const pathname = Astro.url.pathname
     <h1 class="text-xl font-bold text-center">Bookinists</h1>
   </a>
 
-  <nav class="grid gap-2 mt-6">
-    <Link href={`/admin`} isActive={(href) => pathname === href}>
-      <i class="icon-[tabler--shield-lock]"></i>
-      <span class="text-sm font-medium">Admin</span>
-    </Link>
-    <Link href={`/admin/users`} isActive={(href) => pathname === href}>
-      <i class="icon-[tabler--users]"></i>
-      <span class="text-sm font-medium">Users</span>
-    </Link>
-    <Link href={`/admin/books`} isActive={(href) => pathname === href}>
-      <i class="icon-[tabler--book-2]"></i>
-      <span class="text-sm font-medium">Books</span>
-    </Link>
+  <nav class="grid gap-3 mt-6">
+    {
+      navLinks.map((link) => (
+        <>
+          {!link.children ? (
+            <NavItem href={link.href} active={pathname === link.href}>
+              <i class={`${link.icon} size-4 shrink-0`} />
+              <span class="text-sm font-medium">{link.label}</span>
+            </NavItem>
+          ) : null}
+
+          {link.children ? (
+            <NavItem
+              href={link.href}
+              active={link.children.some((o) => o.href === pathname)}
+              isOpen={link.children.some((o) => o.href === pathname)}
+              client:load
+            >
+              <i class={`${link.icon} size-4 shrink-0`} />
+              <span class="text-sm font-medium">{link.label}</span>
+
+              <div slot="submenu" class="grid gap-0.5">
+                {link.children?.map((item) => (
+                  <NavItem href={item.href} active={pathname === item.href}>
+                    <span class="text-xs font-medium">{item.label}</span>
+                  </NavItem>
+                ))}
+              </div>
+            </NavItem>
+          ) : null}
+        </>
+      ))
+    }
   </nav>
 </Navigation>
