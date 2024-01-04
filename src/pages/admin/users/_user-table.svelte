@@ -83,4 +83,7 @@
   </div>
 </section>
 
-<AddUser on:submit={(e) => (userList = [...userList, e.detail])} {dialogOpen} />
+<AddUser
+  bind:dialogOpen
+  on:submit={(e) => (userList = [...userList, e.detail])}
+/>
