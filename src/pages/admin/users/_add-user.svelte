@@ -8,11 +8,14 @@
 
   export let dialogOpen = false
 
+  let submitting = false
   let errors: Record<string, string[]> = {}
 
   const dispatch = createEventDispatcher<{ submit: User }>()
 
   const submit: FormEventHandler<HTMLFormElement> = async (e) => {
+    submitting = true
+
     const form = e.currentTarget
     const formData = new FormData(form)
 
@@ -21,6 +24,7 @@
       body: formData,
     })
 
+    submitting = false
     const json = (await res.json()) as FetchResponse<User>
     if (!json.success) return (errors = json.errors)
 
@@ -119,9 +123,14 @@
         </div>
 
         <button
-          class="flex ml-auto gap-1 text-sm text-white font-medium
-          hover:bg-slate-900/90 bg-slate-900 rounded-md px-4 py-1.5 mt-4"
+          class="flex items-center justify-center text-sm text-white font-medium
+          px-4 py-1.5 rounded-md ml-auto mt-4 bg-slate-900
+          hover:bg-slate-900/90 disabled:bg-slate-900/50"
+          disabled={submitting}
         >
+          {#if submitting}
+            <i class="icon-[tabler--loader-2] shrink-0 animate-spin mr-1.5" />
+          {/if}
           Submit
         </button>
       </form>

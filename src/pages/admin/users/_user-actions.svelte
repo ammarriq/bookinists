@@ -10,13 +10,17 @@
   export let email: string
   export let role: string
 
+  let submitting = false
   let dialogOpen = false
+
   let deleteForm: HTMLFormElement
   let errors: Record<string, string[]> = {}
 
   const dispatch = createEventDispatcher<{ edit: User; delete: string }>()
 
   const editUser: FormEventHandler<HTMLFormElement> = async (e) => {
+    submitting = true
+
     const form = e.currentTarget
     const formData = new FormData(form)
 
@@ -25,6 +29,7 @@
       body: formData,
     })
 
+    submitting = false
     const json = (await res.json()) as FetchResponse<User>
     if (!json.success) return (errors = json.errors)
 
@@ -34,6 +39,7 @@
 
   const deleteUser = async () => {
     if (!confirm('Are you sure you wanna delete the user?')) return
+    submitting = true
 
     const form = deleteForm
     const formData = new FormData(form)
@@ -43,6 +49,7 @@
       body: formData,
     })
 
+    submitting = false
     const json = (await res.json()) as FetchResponse<User>
     if (!json.success) return (errors = json.errors)
 
@@ -74,6 +81,7 @@
     <Dropdown.Item
       class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
       on:click={deleteUser}
+      disabled={submitting}
     >
       <form
         action="/api/user?delete"
@@ -82,7 +90,7 @@
         on:submit|preventDefault
       >
         <input type="hidden" name="id" value={id} />
-        <button type="submit">Delete</button>
+        <button type="submit" disabled={submitting}>Delete</button>
       </form>
     </Dropdown.Item>
   </Dropdown.Content>
@@ -181,9 +189,14 @@
         </div>
 
         <button
-          class="flex ml-auto gap-1 text-sm text-white font-medium
-          hover:bg-slate-900/90 bg-slate-900 rounded-md px-4 py-1.5 mt-4"
+          class="flex items-center justify-center text-sm text-white font-medium
+          px-4 py-1.5 rounded-md ml-auto mt-4 bg-slate-900
+          hover:bg-slate-900/90 disabled:bg-slate-900/50"
+          disabled={submitting}
         >
+          {#if submitting}
+            <i class="icon-[tabler--loader-2] shrink-0 animate-spin mr-1.5" />
+          {/if}
           Submit
         </button>
       </form>

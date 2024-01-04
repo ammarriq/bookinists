@@ -122,6 +122,7 @@ export const POST = createActions({
     }
 
     const id = result.output.id
+    await db.prepare(`DELETE FROM sessions WHERE user_id=?`).bind(id).run()
     await db.prepare(`DELETE FROM users WHERE id=?`).bind(id).run()
 
     return Response.json(
