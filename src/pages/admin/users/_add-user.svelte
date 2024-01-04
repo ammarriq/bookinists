@@ -21,12 +21,7 @@
       body: formData,
     })
 
-    const json = (await res.json()) as {
-      data: User
-      success: boolean
-      errors: typeof errors
-    }
-
+    const json = (await res.json()) as FetchResponse<User>
     if (!json.success) return (errors = json.errors)
 
     dispatch('submit', json.data)
@@ -58,7 +53,11 @@
         </p>
       </Dialog.Title>
 
-      <form action="/api/user" method="post" on:submit|preventDefault={submit}>
+      <form
+        action="/api/user?add"
+        method="post"
+        on:submit|preventDefault={submit}
+      >
         <label for="email" class="text-sm font-medium"> Email </label>
         <div class="relative w-full mt-0.5">
           {#if !!errors.email}

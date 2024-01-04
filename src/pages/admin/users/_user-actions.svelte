@@ -11,6 +11,7 @@
   export let role: string
 
   let dialogOpen = false
+  let deleteForm: HTMLFormElement
   let errors: Record<string, string[]> = {}
 
   const dispatch = createEventDispatcher<{ edit: User; delete: string }>()
@@ -20,7 +21,7 @@
     const formData = new FormData(form)
 
     const res = await fetch(form.action, {
-      method: 'PUT',
+      method: form.method,
       body: formData,
     })
 
@@ -34,9 +35,12 @@
   const deleteUser = async () => {
     if (!confirm('Are you sure you wanna delete the user?')) return
 
-    const res = await fetch('/api/user', {
-      method: 'DELETE',
-      body: id,
+    const form = deleteForm
+    const formData = new FormData(form)
+
+    const res = await fetch(form.action, {
+      method: form.method,
+      body: formData,
     })
 
     const json = (await res.json()) as FetchResponse<User>
@@ -71,7 +75,15 @@
       class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
       on:click={deleteUser}
     >
-      Delete
+      <form
+        action="/api/user?delete"
+        method="post"
+        bind:this={deleteForm}
+        on:submit|preventDefault
+      >
+        <input type="hidden" name="id" value={id} />
+        <button type="submit">Delete</button>
+      </form>
     </Dropdown.Item>
   </Dropdown.Content>
 </Dropdown.Root>
@@ -100,7 +112,11 @@
         </p>
       </Dialog.Title>
 
-      <form action="/api/user" on:submit|preventDefault={editUser}>
+      <form
+        action="/api/user?edit"
+        method="post"
+        on:submit|preventDefault={editUser}
+      >
         <label for="email" class="text-sm font-medium"> Email </label>
         <input type="hidden" name="id" value={id} />
         <div class="relative w-full mt-0.5">

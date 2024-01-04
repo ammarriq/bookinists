@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro'
+import { createActions } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import { email, flatten, object, picklist, safeParse, string } from 'valibot'
@@ -13,118 +13,120 @@ const EditUserSchema = object({
   role: picklist(['admin', 'manager'], 'Invalid role provided'),
 })
 
-export const POST = (async (context) => {
-  const { locals, request } = context
-  const db = locals.runtime.env.SITE_DB
+const DeleteUserSchema = object({
+  id: string('ID is required'),
+})
 
-  if (!locals.user) {
-    return new Response(null, { status: 401 })
-  }
+export const POST = createActions({
+  add: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
 
-  if (locals.user.role !== 'admin') {
-    return new Response(null, { status: 403 })
-  }
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
 
-  const formData = await request.formData()
-  const data = decode(formData)
-  const result = safeParse(AddUserSchema, data)
+    if (locals.user.role !== 'admin') {
+      return new Response(null, { status: 403 })
+    }
 
-  if (!result.success) {
-    const errors = flatten(result.issues).nested
+    const formData = await request.formData()
+    const data = decode(formData)
+    const result = safeParse(AddUserSchema, data)
+
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    const { results } = await db
+      .prepare('SELECT * FROM users WHERE email=?')
+      .bind(result.output.email)
+      .run()
+
+    if (results.length) {
+      const errors = { email: ['User with that email already exists'] }
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    const user = { id: generateId(15), ...result.output }
+    await db
+      .prepare('INSERT INTO users (id, email, role) VALUES (?, ?, ?)')
+      .bind(user.id, user.email, user.role)
+      .run()
+
     return Response.json(
-      { data: null, success: false, errors },
-      { status: 400 }
+      { data: user, success: true, errors: null },
+      { status: 201 }
     )
-  }
+  },
+  edit: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
 
-  const { results } = await db
-    .prepare('SELECT * FROM users WHERE email=?')
-    .bind(result.output.email)
-    .run()
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
 
-  if (results.length) {
-    const errors = { email: ['User with that already exists'] }
+    if (locals.user.role !== 'admin') {
+      return new Response(null, { status: 403 })
+    }
+
+    const formData = await request.formData()
+    const data = decode(formData)
+    const result = safeParse(EditUserSchema, data)
+
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    await db
+      .prepare('UPDATE users SET role=? WHERE id=?')
+      .bind(result.output.role, result.output.id)
+      .run()
+
     return Response.json(
-      { data: null, success: false, errors },
-      { status: 400 }
+      { data: result.output, success: true, errors: null },
+      { status: 201 }
     )
-  }
+  },
+  delete: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
 
-  const uid = generateId(15)
-  await db
-    .prepare('INSERT INTO users (id, email, role) VALUES (?, ?, ?)')
-    .bind(uid, result.output.email, result.output.role)
-    .run()
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
 
-  const user = { uid, ...result.output }
-  return Response.json(
-    { data: user, success: true, errors: null },
-    { status: 201 }
-  )
-}) satisfies APIRoute
+    if (locals.user.role !== 'admin') {
+      return new Response(null, { status: 403 })
+    }
 
-export const PUT = (async (context) => {
-  const { locals, request } = context
-  const db = locals.runtime.env.SITE_DB
+    const formData = await request.formData()
+    const data = decode(formData)
+    const result = safeParse(DeleteUserSchema, data)
 
-  if (!locals.user) {
-    return new Response(null, { status: 401 })
-  }
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
 
-  if (locals.user.role !== 'admin') {
-    return new Response(null, { status: 403 })
-  }
+    const id = result.output.id
+    await db.prepare(`DELETE FROM users WHERE id=?`).bind(id).run()
 
-  const formData = await request.formData()
-  const data = decode(formData)
-  const result = safeParse(EditUserSchema, data)
-
-  if (!result.success) {
-    const errors = flatten(result.issues).nested
     return Response.json(
-      { data: null, success: false, errors },
-      { status: 400 }
+      { data: { id }, success: true, errors: null },
+      { status: 202 }
     )
-  }
-
-  await db
-    .prepare('UPDATE users SET role=? WHERE id=?')
-    .bind(result.output.role, result.output.id)
-    .run()
-
-  return Response.json(
-    { data: result.output, success: true, errors: null },
-    { status: 201 }
-  )
-}) satisfies APIRoute
-
-export const DELETE = (async (context) => {
-  const { locals, request } = context
-  const db = locals.runtime.env.SITE_DB
-
-  if (!locals.user) {
-    return new Response(null, { status: 401 })
-  }
-
-  if (locals.user.role !== 'admin') {
-    return new Response(null, { status: 403 })
-  }
-
-  const id = await request.text()
-  const result = safeParse(string('id is required'), id)
-
-  if (!result.success) {
-    const errors = flatten(result.issues).nested
-    return Response.json(
-      { data: null, success: false, errors },
-      { status: 400 }
-    )
-  }
-
-  await db.prepare(`DELETE FROM users WHERE id=?`).bind(id).run()
-
-  return Response.json(
-    { data: { id }, success: true, errors: null },
-    { status: 202 }
-  )
-}) satisfies APIRoute
+  },
+})
