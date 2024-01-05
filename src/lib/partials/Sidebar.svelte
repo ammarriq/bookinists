@@ -11,7 +11,7 @@
 
 <aside
   class="fixed top-11 lg:top-0 bottom-0 -left-full lg:left-0
-  bg-[#0f172a] px-6 py-4 w-56 duration-500 border-r"
+  bg-[#0f172a] px-6 py-4 w-56 duration-500 border-r z-50"
   class:!left-0={isOpen}
 >
   <slot />

@@ -14,8 +14,10 @@
   <header class="grid md:grid-cols-[auto_1fr] items-center">
     <h2 class="font-semibold">Users</h2>
 
-    <aside class="grid grid-cols-[1fr_auto_auto] gap-2 md:ml-auto mt-2 md:mt-0">
-      <form class="relative grow min-w-full md:min-w-72">
+    <aside
+      class="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto] gap-2 md:ml-auto mt-2 md:mt-0"
+    >
+      <form class="relative grow min-w-full md:min-w-72 col-span-2 sm:col-auto">
         <i
           class="icon-[tabler--search] absolute top-1/2 -translate-y-1/2 left-2.5"
         />
@@ -31,8 +33,8 @@
 
       <button
         class="flex items-center gap-1 text-sm font-medium
-        px-4 py-1.5 border shadow-sm rounded-md
-        whitespace-nowrap bg-white hover:bg-slate-50"
+        whitespace-nowrap bg-white hover:bg-slate-50
+        px-4 py-1.5 border shadow-sm rounded-md"
       >
         <i class="icon-[tabler--adjustments-alt]" />
         <span>Filters</span>
@@ -41,8 +43,8 @@
       <button
         on:click={() => (dialogOpen = true)}
         class="flex items-center gap-1 text-sm text-white font-medium
-        px-4 py-1.5 border shadow-sm rounded-md
-        whitespace-nowrap bg-slate-900 hover:bg-slate-900/90"
+        whitespace-nowrap bg-slate-900 hover:bg-slate-900/90
+        px-4 py-1.5 border shadow-sm rounded-md"
       >
         <span>Add user</span>
       </button>

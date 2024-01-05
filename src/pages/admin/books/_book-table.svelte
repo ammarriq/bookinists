@@ -14,8 +14,10 @@
   <header class="grid md:grid-cols-[auto_1fr] items-center">
     <h2 class="font-semibold">Books</h2>
 
-    <aside class="grid grid-cols-[1fr_auto_auto] gap-2 md:ml-auto mt-2 md:mt-0">
-      <form class="relative grow min-w-full md:min-w-72">
+    <aside
+      class="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto] gap-2 md:ml-auto mt-2 md:mt-0"
+    >
+      <form class="relative grow min-w-full md:min-w-72 col-span-2 sm:col-auto">
         <i
           class="icon-[tabler--search] absolute top-1/2 -translate-y-1/2 left-2.5"
         />
