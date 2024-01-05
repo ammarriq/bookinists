@@ -11,7 +11,7 @@ const navLinks = [
     icon: 'icon-[tabler--book-2]',
     label: 'Books',
     children: [
-      { label: 'Books', href: '/admin/books' },
+      { label: 'All Books', href: '/admin/books' },
       { label: 'Genre', href: '/admin/genre' },
       { label: 'Collections', href: '/admin/collections' },
       { label: 'Authors', href: '/admin/authors' },
@@ -50,6 +50,7 @@ const navLinks = [
               <div slot="submenu" class="grid gap-0.5">
                 {link.children?.map((item) => (
                   <NavItem href={item.href} active={pathname === item.href}>
+                    <i class="icon-[tabler--point] size-2.5" />
                     <span class="text-xs font-medium">{item.label}</span>
                   </NavItem>
                 ))}
