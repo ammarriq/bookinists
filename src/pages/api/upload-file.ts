@@ -21,19 +21,27 @@ export const POST = createActions({
 
     if (!result.success) {
       return Response.json(
-        { success: false, errors: flatten(result.issues).nested },
+        { success: false, s: flatten(result.issues).nested },
         { status: 400 }
       )
     }
 
-    const res = await S3.send(
-      new PutObjectCommand({
-        Bucket: import.meta.env.R2_BUCKET_NAME,
-        Key: `${result.output.filename}`,
-        Body: Buffer.from(await result.output.file.arrayBuffer()),
-      })
-    )
+    try {
+      const res = await S3.send(
+        new PutObjectCommand({
+          Bucket: import.meta.env.R2_BUCKET_NAME,
+          Key: `${result.output.filename}`,
+          Body: Buffer.from(await result.output.file.arrayBuffer()),
+        })
+      )
 
-    return Response.json(res)
+      return Response.json(res)
+    } catch (err) {
+      const error = err as Error
+      return Response.json(
+        { message: error.message, name: error.name },
+        { status: 500 }
+      )
+    }
   },
 })
