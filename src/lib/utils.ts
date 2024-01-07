@@ -9,6 +9,16 @@ export const getValiErrors = (issues: Issues) => {
   }, {})
 }
 
+export const createFormData = (obj: Record<string, string | Blob>) => {
+  const formData = new FormData()
+
+  for (const [key, value] of Object.entries(obj)) {
+    formData.append(key, value)
+  }
+
+  return formData
+}
+
 export const createActions = (actions: Record<string, APIRoute>) => {
   return async (context: APIContext) => {
     const searchParams = [...context.url.searchParams.keys()]

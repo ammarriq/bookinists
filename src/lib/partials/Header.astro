@@ -7,7 +7,7 @@ const menu = [{ isPost: true, label: 'Logout', url: '/api/logout' }]
 ---
 
 <header
-  class="fixed top-0 left-0 lg:left-56 right-0
+  class="fixed top-0 left-0 lg:left-56 right-0 z-40
   bg-white flex items-center px-4 h-11 border-b"
 >
   <Dropdown client:load menu={menu} picture={user?.picture} />

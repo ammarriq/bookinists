@@ -16,7 +16,7 @@
   <td class="py-2.5 px-4 whitespace-nowrap">
     <div class="flex gap-2 items-center min-w-max">
       <Avatar.Root class="flex size-8 items-center justify-center rounded-full">
-        <Avatar.Image src={user.picture} alt="@huntabyte" />
+        <Avatar.Image src={user.picture} alt={user.name} />
         <Avatar.Fallback
           class="flex items-center justify-center
           bg-red-600 rounded-full size-8"

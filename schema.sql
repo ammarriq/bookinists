@@ -20,3 +20,13 @@ CREATE TABLE IF NOT EXISTS sessions (
    fresh INTEGER,
    FOREIGN KEY(user_id) REFERENCES users(id)
 );
+
+DROP TABLE IF EXISTS tags;
+CREATE TABLE IF NOT EXISTS tags (
+   id TEXT PRIMARY KEY,
+   name TEXT,
+   description TEXT,
+   icon INTEGER,
+   text_color TEXT,
+   bg_color TEXT
+);

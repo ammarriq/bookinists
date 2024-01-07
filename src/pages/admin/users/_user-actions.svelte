@@ -100,7 +100,7 @@
   <Dialog.Portal>
     <Dialog.Overlay
       transition={(node) => fade(node, { duration: 150 })}
-      class="fixed inset-0 bg-black/60"
+      class="fixed inset-0 bg-black/60 z-50"
     />
 
     <Dialog.Content

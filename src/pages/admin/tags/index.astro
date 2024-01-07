@@ -1,0 +1,24 @@
+---
+import type { Tag } from '@/pages/api/tag'
+
+import { getFile } from '@/lib/r2'
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import BookTable from './_tags.svelte'
+
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const { results } = await db.prepare('SELECT * FROM tags').run<Tag>()
+
+const tags = await Promise.all(
+  results.map(async (o) => ({ ...o, icon: await getFile(o.icon) })),
+)
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <BookTable tags={tags} client:load />
+  </main>
+</AdminLayout>

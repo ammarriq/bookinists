@@ -1,10 +1,13 @@
 import { defineMiddleware } from 'astro:middleware'
 import { verifyRequestOrigin } from 'lucia'
-import { initLucia } from './lib/auth'
+import { initLucia } from '@/lib/auth'
+import { schema } from '@/schema'
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { locals, cookies, request } = context
-  // const db = locals.runtime.env.SITE_DB
+
+  const db = locals.runtime.env.SITE_DB
+  await db.exec(schema)
 
   const lucia = initLucia(locals.runtime.env.SITE_DB)
 
