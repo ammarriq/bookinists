@@ -3,38 +3,51 @@
   import { toast } from 'svelte-sonner'
 
   export let error: string[] = []
-  export let filename = ''
+  export let key = ''
   export let status: 'idle' | 'pending' | 'resolved' = 'idle'
 
   let file: File
   let progress = 0
 
+  const uploadFile = (formData: FormData) => {
+    status = 'pending'
+
+    const onReadyStateChange = (xhr: XMLHttpRequest) => {
+      if (xhr.readyState !== 4) return
+
+      const res = JSON.parse(xhr.response) as FetchResponse<{ key: string }>
+      if (!res.success) {
+        return toast.error(res.errors.file[0])
+      }
+
+      key = res.data.key
+    }
+
+    const onProgress = (e: ProgressEvent<EventTarget>) => {
+      if (!e.lengthComputable) return
+      progress = Math.round((e.loaded / e.total) * 100)
+    }
+
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', '/api/file')
+
+    xhr.onload = () => (status = 'resolved')
+    xhr.onreadystatechange = () => onReadyStateChange(xhr)
+    xhr.upload.onprogress = (e) => onProgress(e)
+
+    xhr.send(formData)
+  }
+
   const onchange = (e: Event) => {
     const target = e.target as HTMLInputElement
     file = target.files![0]
-    filename = `${Date.now()}-${file.name}`
 
     if (!file.type.includes('image/')) {
       return toast.error('Invalid file type')
     }
 
-    const formData = createFormData({
-      filename: filename,
-      file: file,
-    })
-
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', '/api/upload-file')
-
-    xhr.upload.onload = () => (status = 'pending')
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        progress = Math.round((e.loaded / e.total) * 100)
-      }
-    }
-
-    xhr.send(formData)
-    xhr.onload = () => (status = 'resolved')
+    const formData = createFormData({ file: file })
+    uploadFile(formData)
   }
 </script>
 
@@ -102,8 +115,8 @@
     {/if}
 
     <div class="space-y-0.5 mr-10">
-      <p class="font-medium line-clamp-1">{filename}</p>
       {#if file}
+        <p class="font-medium line-clamp-1">{file.name}</p>
         <p class="text-xs text-gray-500/70">
           {(file.size / (1024 * 1024)).toFixed(2)} MB
         </p>
@@ -118,7 +131,7 @@
     {/if}
   </div>
 
-  <input type="hidden" name="icon" value={filename} />
+  <input type="hidden" name="icon" value={key} />
 {/if}
 
 <style lang="postcss">

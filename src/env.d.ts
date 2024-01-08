@@ -7,6 +7,7 @@
 
 type ENV = {
   SITE_DB: import('@cloudflare/workers-types').D1Database
+  SITE_BUCKET: import('@cloudflare/workers-types').R2Bucket
 }
 
 type Runtime = import('@astrojs/cloudflare').AdvancedRuntime<ENV>

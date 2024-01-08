@@ -82,7 +82,6 @@ export const POST = createActions({
 
     if (!result.success) {
       const errors = flatten(result.issues).nested
-      console.log(data.icon)
       return Response.json(
         { data: null, success: false, errors },
         { status: 400 }
@@ -114,6 +113,7 @@ export const POST = createActions({
   },
   delete: async ({ locals, request }) => {
     const db = locals.runtime.env.SITE_DB
+    const bucket = locals.runtime.env.SITE_BUCKET
 
     if (!locals.user) {
       return new Response(null, { status: 401 })
@@ -131,10 +131,18 @@ export const POST = createActions({
       )
     }
 
-    await db
+    const iconKey = await db
+      .prepare(`SELECT icon FROM tags WHERE id=?`)
+      .bind(result.output.id)
+      .first<string>('icon')
+
+    const deleteIcon = bucket.delete(iconKey as string)
+    const deleteTag = db
       .prepare(`DELETE FROM tags WHERE id=?`)
-      .bind(result.output.id) //
+      .bind(result.output.id)
       .run()
+
+    await Promise.all([deleteIcon, deleteTag])
 
     return Response.json(
       { data: result.output, success: true, errors: null },

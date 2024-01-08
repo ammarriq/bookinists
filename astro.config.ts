@@ -17,6 +17,9 @@ export default defineConfig({
         SITE_DB: {
           type: 'd1',
         },
+        SITE_BUCKET: {
+          type: 'r2',
+        },
       },
     },
   }),

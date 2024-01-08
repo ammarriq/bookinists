@@ -8,3 +8,7 @@ database_name = "site"
 database_id = "06249c59-11ff-4369-a2a2-cc1b863790e8"
 migrations_table = "users"
 migrations_dir = ".wrangler/migrations"
+
+[[r2_buckets]]
+binding = "SITE_BUCKET"
+bucket_name = "bookinist-01"
