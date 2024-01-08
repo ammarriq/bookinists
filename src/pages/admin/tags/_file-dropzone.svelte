@@ -29,12 +29,11 @@
     }
 
     const xhr = new XMLHttpRequest()
+    xhr.addEventListener('load', () => (status = 'resolved'))
+    xhr.upload.addEventListener('progress', (e) => onProgress(e))
+    xhr.addEventListener('readystatechange', () => onReadyStateChange(xhr))
+
     xhr.open('POST', '/api/file')
-
-    xhr.onload = () => (status = 'resolved')
-    xhr.onreadystatechange = () => onReadyStateChange(xhr)
-    xhr.upload.onprogress = (e) => onProgress(e)
-
     xhr.send(formData)
   }
 
@@ -97,12 +96,12 @@
     {#if status === 'pending'}
       <i
         class="icon-[tabler--loader-2] animate-spin
-        absolute top-4 left-3.5 size-3.5 duration-300"
+        absolute top-3.5 left-3.5 size-3.5 duration-300"
       />
     {:else}
       <i
         class="icon-[tabler--check] size-3.5
-        absolute top-4 left-3 text-green-500"
+        absolute top-3.5 left-3 text-green-500"
       />
     {/if}
 
@@ -115,8 +114,8 @@
     {/if}
 
     <div class="space-y-0.5 mr-10">
+      <p class="font-medium line-clamp-1">{file?.name ?? key}</p>
       {#if file}
-        <p class="font-medium line-clamp-1">{file.name}</p>
         <p class="text-xs text-gray-500/70">
           {(file.size / (1024 * 1024)).toFixed(2)} MB
         </p>

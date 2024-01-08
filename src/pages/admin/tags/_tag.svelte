@@ -7,10 +7,11 @@
 
   export let tag: Tag
 
-  let icon: string
+  let icon = ''
 
   const getFile = async (key: string) => {
     const res = await fetch(`/api/file?key=${key}`)
+
     const blob = new Blob([await res.arrayBuffer()])
     const url = URL.createObjectURL(blob)
 

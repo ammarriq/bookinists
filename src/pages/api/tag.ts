@@ -2,16 +2,13 @@ import { createActions } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
+  type Output,
   flatten,
   object,
-  optional,
   pick,
-  required,
   safeParse,
   string,
-  type Output,
   minLength,
-  merge,
   omit,
 } from 'valibot'
 
@@ -19,7 +16,7 @@ const TagSchema = object({
   id: string([minLength(15, '')]),
   name: string([minLength(4, 'Name is required')]),
   description: string([minLength(20, 'Description is required')]),
-  icon: string('Icon is required'),
+  icon: string([minLength(15, 'Icon is required')]),
   text_color: string('Text color is required'),
   bg_color: string('Background color is required'),
 })
@@ -94,7 +91,6 @@ export const POST = createActions({
       icon: result.output.icon,
       text_color: result.output.text_color,
       bg_color: result.output.bg_color,
-      id: result.output.id,
     }
 
     await db
@@ -103,11 +99,11 @@ export const POST = createActions({
         SET name=?, description=?, icon=?, text_color=?, bg_color=?
         WHERE id=?`
       )
-      .bind(...Object.keys(tag))
+      .bind(...Object.values(tag), result.output.id)
       .run()
 
     return Response.json(
-      { data: result.output, success: true, errors: null },
+      { data: tag, success: true, errors: null },
       { status: 201 }
     )
   },
@@ -136,13 +132,12 @@ export const POST = createActions({
       .bind(result.output.id)
       .first<string>('icon')
 
-    const deleteIcon = bucket.delete(iconKey as string)
-    const deleteTag = db
-      .prepare(`DELETE FROM tags WHERE id=?`)
-      .bind(result.output.id)
-      .run()
+    if (iconKey) bucket.delete(iconKey)
 
-    await Promise.all([deleteIcon, deleteTag])
+    await db
+      .prepare(`DELETE FROM tags WHERE id=?`)
+      .bind(result.output.id) //
+      .run()
 
     return Response.json(
       { data: result.output, success: true, errors: null },

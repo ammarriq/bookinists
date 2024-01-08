@@ -120,7 +120,11 @@
         on:submit|preventDefault={editTag}
       >
         <input type="hidden" name="id" value={tag.id} />
-        <FileDropzone error={errors.icon} key={tag.icon} status="resolved" />
+        <FileDropzone
+          error={errors.icon}
+          key={tag.icon.split(':::').at(-1)}
+          status="resolved"
+        />
 
         <label class="block">
           <span class="text-sm font-medium"> Name </span>
