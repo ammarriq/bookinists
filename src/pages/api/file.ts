@@ -55,10 +55,18 @@ export const POST = (async ({ locals, request }) => {
 
   const key = `${generateId(15)}${getExtension(file.name)}`
 
-  await bucket.put(key, await file.arrayBuffer(), {
-    httpMetadata: { contentType: file.type },
-    customMetadata: { filename: file.name },
-  })
+  try {
+    await bucket.put(key, await file.arrayBuffer(), {
+      httpMetadata: { contentType: file.type },
+      customMetadata: { filename: file.name },
+    })
+  } catch (error) {
+    const err = error as Error
+    return Response.json(
+      { message: err.message, name: err.name },
+      { status: 500 }
+    )
+  }
 
   return Response.json(
     { data: { key }, success: true, errors: null },
