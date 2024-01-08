@@ -1,6 +1,6 @@
 import { createActions } from '@/lib/utils'
 import { decode } from 'decode-formdata'
-import { generateId } from 'lucia'
+import { generateId, type User } from 'lucia'
 import { email, flatten, object, picklist, safeParse, string } from 'valibot'
 
 const AddUserSchema = object({
@@ -41,12 +41,12 @@ export const POST = createActions({
       )
     }
 
-    const { results } = await db
+    const currentUser = await db
       .prepare('SELECT * FROM users WHERE email=?')
       .bind(result.output.email)
-      .run()
+      .first<User>()
 
-    if (results.length) {
+    if (currentUser) {
       const errors = { email: ['User with that email already exists'] }
       return Response.json(
         { data: null, success: false, errors },
