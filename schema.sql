@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS tags (
    id TEXT PRIMARY KEY,
    name TEXT,
    description TEXT,
-   icon INTEGER,
+   icon TEXT,
    text_color TEXT,
    bg_color TEXT
 );
@@ -36,5 +36,5 @@ CREATE TABLE IF NOT EXISTS collections (
    id TEXT PRIMARY KEY,
    name TEXT,
    description TEXT,
-   image INTEGER,
+   image TEXT
 );
