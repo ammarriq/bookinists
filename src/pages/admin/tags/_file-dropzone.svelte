@@ -33,11 +33,11 @@
     xhr.upload.addEventListener('progress', (e) => onProgress(e))
     xhr.addEventListener('readystatechange', () => onReadyStateChange(xhr))
 
-    xhr.open('POST', '/api/file')
+    xhr.open('PUT', '/api/file')
     xhr.send(formData)
   }
 
-  const onchange = (e: Event) => {
+  const onchange = async (e: Event) => {
     const target = e.target as HTMLInputElement
     file = target.files![0]
 

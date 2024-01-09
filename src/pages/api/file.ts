@@ -35,7 +35,7 @@ export const GET = (async ({ locals, url }) => {
   return new Response(await object.arrayBuffer(), { status: 200 })
 }) satisfies APIRoute
 
-export const POST = (async ({ locals, request }) => {
+export const PUT = (async ({ locals, request }) => {
   const bucket = locals.runtime.env.SITE_BUCKET
 
   if (!locals.user) {
