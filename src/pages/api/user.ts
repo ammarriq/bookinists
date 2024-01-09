@@ -121,6 +121,14 @@ export const POST = createActions({
       )
     }
 
+    if (locals.user.id === result.output.id) {
+      const errors = { message: [`You can't delete yourself.`] }
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 409 }
+      )
+    }
+
     const id = result.output.id
     await db.prepare(`DELETE FROM users WHERE id=?`).bind(id).run()
 

@@ -5,6 +5,7 @@
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
   import { Dialog, Select, DropdownMenu as Dropdown } from 'bits-ui'
+  import { toast } from 'svelte-sonner'
 
   export let id: string
   export let email: string
@@ -51,7 +52,10 @@
 
     submitting = false
     const json = (await res.json()) as FetchResponse<User>
-    if (!json.success) return (errors = json.errors)
+    if (!json.success) {
+      const err = json.errors.message.at(-1)
+      return toast.error(err ?? 'Something went wrong. Try again later.')
+    }
 
     dispatch('delete', id)
   }
