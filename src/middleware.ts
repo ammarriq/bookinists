@@ -8,6 +8,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const db = locals.runtime.env.SITE_DB
   await db.exec(schema)
+  // await db
+  //   .prepare(`INSERT INTO users (id, email, role) VALUES (?, ?, ?)`)
+  //   .bind(generateId(15), 'ammariqbal043@gmail.com', 'admin')
+  //   .run()
 
   const lucia = initLucia(locals.runtime.env.SITE_DB)
 

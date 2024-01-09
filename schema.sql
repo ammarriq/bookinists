@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS sessions (
    user_id TEXT,
    expires_at TEXT,
    fresh INTEGER,
-   FOREIGN KEY(user_id) REFERENCES users(id)
+   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS tags;
