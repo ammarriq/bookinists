@@ -13,7 +13,7 @@
 
   <Dropdown.Content
     transition={(e) => fly(e, { duration: 150, y: 10 })}
-    class="p-1 rounded-md w-40 text-sm bg-white shadow mt-1"
+    class="p-1 rounded-md w-40 text-sm bg-white shadow mt-1 z-50"
   >
     {#each menu as item, i (i)}
       {#if !item.isPost}
