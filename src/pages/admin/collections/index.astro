@@ -1,19 +1,21 @@
 ---
-import type { Tag } from '@/pages/api/tag'
+import type { Collection } from '@/pages/api/collection'
 
 import AdminLayout from '@/layouts/AdminLayout.astro'
-import Tags from './_tags.svelte'
+import Collections from './_collections.svelte'
 
 const db = Astro.locals.runtime.env.SITE_DB
 
 const user = Astro.locals.user
 if (!user) return Astro.redirect('/login')
 
-const { results: tags } = await db.prepare('SELECT * FROM tags').run<Tag>()
+const { results: collections } = await db
+  .prepare('SELECT * FROM collections')
+  .run<Collection>()
 ---
 
 <AdminLayout title="Admin | Bookinists">
   <main class="px-4 py-6">
-    <Tags tags={tags} client:load />
+    <Collections collections={collections} client:load />
   </main>
 </AdminLayout>

@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Tag as ITag } from '@/pages/api/tag'
+  import type { Collection as ICollection } from '@/pages/api/collection'
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
   import { Dialog, DropdownMenu as Dropdown } from 'bits-ui'
   import FileDropzone from './_file-dropzone.svelte'
 
-  export let tag: ITag
+  export let collection: ICollection
 
   let submitting = false
   let dialogOpen = false
@@ -16,11 +16,11 @@
   let errors: Record<string, string[]> = {}
 
   const dispatch = createEventDispatcher<{
-    edit: ITag
+    edit: ICollection
     delete: string
   }>()
 
-  const editTag: FormEventHandler<HTMLFormElement> = async (e) => {
+  const editColl: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
 
     const form = e.currentTarget
@@ -32,15 +32,15 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<ITag>
+    const json = (await res.json()) as FetchResponse<ICollection>
     if (!json.success) return (errors = json.errors)
 
     dialogOpen = false
     dispatch('edit', json.data)
   }
 
-  const deleteTag = async () => {
-    if (!confirm('Are you sure you wanna delete the tag?')) return
+  const deleteColl = async () => {
+    if (!confirm('Are you sure you wanna delete the collection?')) return
     submitting = true
 
     const form = deleteForm
@@ -52,10 +52,10 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<ITag>
+    const json = (await res.json()) as FetchResponse<ICollection>
     if (!json.success) return (errors = json.errors)
 
-    dispatch('delete', tag.id)
+    dispatch('delete', collection.id)
   }
 </script>
 
@@ -77,16 +77,16 @@
     </Dropdown.Item>
     <Dropdown.Item
       class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-      on:click={deleteTag}
+      on:click={deleteColl}
       disabled={submitting}
     >
       <form
-        action="/api/tag?delete"
+        action="/api/collection?delete"
         method="post"
         bind:this={deleteForm}
         on:submit|preventDefault
       >
-        <input type="hidden" name="id" value={tag.id} />
+        <input type="hidden" name="id" value={collection.id} />
         <button type="submit" disabled={submitting}>Delete</button>
       </form>
     </Dropdown.Item>
@@ -110,17 +110,21 @@
       />
 
       <Dialog.Title class="space-y-1 mb-4">
-        <h2 class="text-base font-semibold">Edit Tag</h2>
+        <h2 class="text-base font-semibold">Edit Collection</h2>
       </Dialog.Title>
 
       <form
-        action="/api/tag?edit"
+        action="/api/collection?edit"
         method="post"
         class="space-y-4"
-        on:submit|preventDefault={editTag}
+        on:submit|preventDefault={editColl}
       >
-        <input type="hidden" name="id" value={tag.id} />
-        <FileDropzone error={errors.icon} key={tag.icon} status="resolved" />
+        <input type="hidden" name="id" value={collection.id} />
+        <FileDropzone
+          error={errors.image}
+          key={collection.image}
+          status="resolved"
+        />
 
         <label class="block">
           <span class="text-sm font-medium"> Name </span>
@@ -135,51 +139,11 @@
               name="name"
               class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
-              value={tag.name}
+              value={collection.name}
               class:border-red-500={!!errors.name}
             />
           </div>
         </label>
-
-        <fieldset class="grid grid-cols-2 gap-x-4">
-          <label class="grid">
-            <span class="text-sm font-medium"> Text color </span>
-            <div class="relative w-full mt-0.5">
-              {#if !!errors.text_color}
-                <small class="text-sm absolute top-full left-0 text-red-500">
-                  {errors.text_color}
-                </small>
-              {/if}
-              <input
-                type="color"
-                name="text_color"
-                class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
-                shadow-sm focus:outline-slate-900"
-                value={tag.text_color}
-                class:border-red-500={!!errors.text_color}
-              />
-            </div>
-          </label>
-
-          <label class="grid">
-            <span class="text-sm font-medium"> Background color </span>
-            <div class="relative w-full mt-0.5">
-              {#if !!errors.bg_color}
-                <small class="text-sm absolute top-full left-0 text-red-500">
-                  {errors.bg_color}
-                </small>
-              {/if}
-              <input
-                type="color"
-                name="bg_color"
-                class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
-                shadow-sm focus:outline-slate-900"
-                value={tag.bg_color}
-                class:border-red-500={!!errors.bg_color}
-              />
-            </div>
-          </label>
-        </fieldset>
 
         <label class="block">
           <span class="text-sm font-medium"> Description </span>
@@ -193,7 +157,7 @@
               name="description"
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900 h-20"
-              value={tag.description}
+              value={collection.description}
               class:border-red-500={!!errors.description}
             />
           </div>

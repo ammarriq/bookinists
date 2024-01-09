@@ -148,7 +148,7 @@
     {/if}
   </div>
 
-  <input type="hidden" name="icon" value={key} />
+  <input type="hidden" name="image" value={key} />
 {/if}
 
 <style lang="postcss">

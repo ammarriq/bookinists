@@ -1,18 +1,18 @@
 <script lang="ts">
-  import type { Tag as ITag } from '@/pages/api/tag'
+  import type { Collection as ICollection } from '@/pages/api/collection'
 
-  import AddTag from './_add-tag.svelte'
-  import Tag from './_tag.svelte'
+  import AddCollection from './_add-collection.svelte'
+  import Collection from './_collection.svelte'
 
-  export let tags: ITag[]
+  export let collections: ICollection[]
 
-  let tagList = [...tags]
+  let collList = [...collections]
   let dialogOpen = false
 </script>
 
 <section class="bg-white px-6 py-4 border rounded-md">
   <header class="grid md:grid-cols-[auto_1fr] items-center">
-    <h2 class="font-semibold">Tags</h2>
+    <h2 class="font-semibold">Collections</h2>
 
     <aside
       class="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto] gap-2 md:ml-auto mt-2 md:mt-0"
@@ -46,22 +46,22 @@
         px-4 py-1.5 border shadow-sm rounded-md
         whitespace-nowrap bg-slate-900 hover:bg-slate-900/90"
       >
-        <span>Add tag</span>
+        <span>Add collection</span>
       </button>
     </aside>
   </header>
 
   <ul class="mt-4 overflow-x-auto grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-    {#each tagList as tag (tag.id)}
-      <Tag
-        {tag}
+    {#each collList as collection (collection.id)}
+      <Collection
+        {collection}
         on:edit={(e) => {
-          const tagIdx = tagList.findIndex((o) => o.id === e.detail.id)
-          const tag = { ...tagList[tagIdx], ...e.detail }
-          tagList[tagIdx] = tag
+          const collIdx = collList.findIndex((o) => o.id === e.detail.id)
+          const collection = { ...collList[collIdx], ...e.detail }
+          collList[collIdx] = collection
         }}
         on:delete={(e) => {
-          tagList = tagList.filter((o) => o.id !== e.detail)
+          collList = collList.filter((o) => o.id !== e.detail)
         }}
       />
     {:else}
@@ -70,15 +70,15 @@
         p-5 sm:px-10 sm:py-6 md:px-20 md:py-12 text-sm border border-dashed rounded-md"
       >
         <div class="size-16 bg-slate-100 grid place-items-center rounded-full">
-          <i class="icon-[tabler--tag] size-10 text-slate-900" />
+          <i class="icon-[tabler--folder] size-10 text-slate-900" />
         </div>
 
         <hgroup class="text-center my-5 space-y-2.5">
           <h3 class="text-xl font-semibold text-slate-900 tracking-wide">
-            No tags created
+            No collections created
           </h3>
           <p class="text-slate-500/80">
-            You don't have any tags yet. Start creating by using the below
+            You don't have any collections yet. Start creating by using the below
             button.
           </p>
         </hgroup>
@@ -90,11 +90,14 @@
           whitespace-nowrap bg-white hover:bg-slate-50"
         >
           <i class="icon-[tabler--plus]" />
-          <span>Add tag</span>
+          <span>Add collection</span>
         </button>
       </div>
     {/each}
   </ul>
 </section>
 
-<AddTag bind:dialogOpen on:submit={(e) => (tagList = [...tagList, e.detail])} />
+<AddCollection
+  bind:dialogOpen
+  on:submit={(e) => (collList = [...collList, e.detail])}
+/>
