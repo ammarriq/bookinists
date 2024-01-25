@@ -1,9 +1,9 @@
 import { defineMiddleware } from 'astro:middleware'
 import { verifyRequestOrigin } from 'lucia'
 import { initLucia } from '@/lib/auth'
-import { readFile } from 'node:fs/promises'
 
 const getSchema = async () => {
+  const { readFile } = await import('node:fs/promises')
   const schema = (await readFile('./schema.sql', 'utf-8')).toString()
 
   return schema
