@@ -43,7 +43,7 @@
 
   <td class="py-2.5 px-4 whitespace-nowrap">
     <div class="space-x-1">
-      {#each stars(3.5) as star, i (i)}
+      {#each stars(book.rating) as star, i (i)}
         <i
           class="text-orange-500 size-4"
           class:icon-[tabler--star-filled]={star === 'full'}
