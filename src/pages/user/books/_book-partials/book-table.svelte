@@ -83,6 +83,15 @@
               bookList = bookList.filter((o) => o.id !== e.detail)
             }}
           />
+        {:else}
+          <tr>
+            <td
+              colspan="6"
+              class="text-sm text-center text-slate-500 italic py-2"
+            >
+              No book found
+            </td>
+          </tr>
         {/each}
       </tbody>
     </table>
