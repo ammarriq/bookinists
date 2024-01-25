@@ -134,31 +134,21 @@ export const POST = createActions({
       created_on: Date.now(),
     }
 
-    const authors: Author[] = result.output.authors.map((a) => ({
+    const authors = result.output.authors.map((a) => ({
       id: generateId(15),
       name: a,
-      avatar: '',
-      info: '',
-      country_id: null,
       created_on: Date.now(),
     }))
 
-    const tags: Tag[] = result.output.tags.map((a) => ({
+    const tags = result.output.tags.map((a) => ({
       id: generateId(15),
       name: a,
-      icon: '',
-      description: '',
-      text_color: '',
-      bg_color: '',
       created_on: Date.now(),
     }))
 
-    const publisher: Publisher = {
+    const publisher = {
       id: generateId(15),
       name: result.output.publisher,
-      logo: '',
-      info: '',
-      country_id: null,
       created_on: Date.now(),
     }
 
@@ -170,20 +160,20 @@ export const POST = createActions({
 
     const author_stmt = db.prepare(
       `INSERT INTO authors
-      (id, name, avatar, info, country_id, created_on) 
-      VALUES (?, ?, ?, ?, ?, ?)`
+      (id, name, created_on) 
+      VALUES (?, ?, ?)`
     )
 
     const tag_stmt = db.prepare(
       `INSERT INTO tags
-      (id, name, icon, description, text_color, bg_color, created_on) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`
+      (id, name, created_on) 
+      VALUES (?, ?, ?)`
     )
 
     const publisher_stmt = db.prepare(
       `INSERT INTO publishers
-      (id, name, logo, info, country_id, created_on) 
-      VALUES (?, ?, ?, ?, ?, ?)`
+      (id, name, created_on) 
+      VALUES (?, ?, ?)`
     )
 
     await db.batch([
