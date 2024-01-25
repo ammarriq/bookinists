@@ -1,0 +1,143 @@
+---
+import NavItem from './NavItem.svelte'
+import Navigation from './Sidebar.svelte'
+
+const pathname = Astro.url.pathname
+
+const navLinks = [
+  {
+    icon: 'icon-[tabler--shield-lock]',
+    label: 'Admin',
+    href: '/admin',
+  },
+  {
+    icon: 'icon-[tabler--book-2]',
+    label: 'Books',
+    href: '/user/books',
+    // children: [{ label: 'All Books', href: '/user/books' }],
+  },
+  {
+    icon: 'icon-[tabler--list]',
+    label: 'Lists',
+    href: '/user/lists',
+  },
+  {
+    icon: 'icon-[tabler--tag]',
+    label: 'Tags',
+    href: '/user/tags',
+  },
+  {
+    icon: 'icon-[tabler--masks-theater]',
+    label: 'Genres',
+    href: '/user/genres',
+  },
+  {
+    icon: 'icon-[tabler--folder]',
+    label: 'Collections',
+    href: '/user/collections',
+  },
+  {},
+  {
+    icon: 'icon-[tabler--feather]',
+    label: 'Authors',
+    href: '/user/authors',
+  },
+  {
+    icon: 'icon-[tabler--file-text]',
+    label: 'Publishers',
+    href: '/user/publishers',
+  },
+  {},
+  {
+    icon: 'icon-[tabler--award]',
+    label: 'Awards',
+    href: '/user/awards',
+  },
+  {
+    icon: 'icon-[tabler--map-pin]',
+    label: 'Locations',
+    href: '/user/locations',
+  },
+  {
+    icon: 'icon-[tabler--door]',
+    label: 'Rooms',
+    href: '/user/rooms',
+  },
+  {
+    icon: 'icon-[tabler--server-2]',
+    label: 'Storages',
+    href: '/user/storages',
+  },
+  {
+    icon: 'icon-[tabler--building-store]',
+    label: 'Marketplaces',
+    href: '/user/marketplaces',
+  },
+  {},
+  {
+    icon: 'icon-[tabler--flag]',
+    label: 'Countries',
+    href: '/user/countries',
+  },
+  {
+    icon: 'icon-[tabler--address-book]',
+    label: 'Contacts',
+    href: '/user/contacts',
+  },
+]
+---
+
+<Navigation client:load>
+  <a href="/" class="flex items-center gap-2 text-white px-5">
+    <i class="icon-[tabler--books] size-6"></i>
+    <h1 class="text-xl font-bold text-center">Bookinists</h1>
+  </a>
+
+  <nav class="scrollbar grid gap-3 content-start mt-6 overflow-y-auto px-5">
+    {
+      navLinks.map((link) => (
+        <>
+          { link.href ? (
+            <NavItem href={link.href} active={pathname.includes(link.href)}>
+              <i class={`${link.icon} size-4 shrink-0`} />
+              <span class="text-sm font-medium">{link.label}</span>
+            </NavItem>
+          ) : null}
+
+          {!link.href ? <hr class="my-4 border-slate-700" /> : null}
+
+         <!-- {link.children ? (
+            <NavItem
+              href={link.href}
+              active={link.children.some((o) => o.href === pathname)}
+              isOpen={link.children.some((o) => o.href === pathname)}
+              client:load
+            >
+              <i class={`${link.icon} size-4 shrink-0`} />
+              <span class="text-sm font-medium">{link.label}</span>
+
+              <div slot="submenu" class="grid gap-0.5">
+                {link.children?.map((item) => (
+                  <NavItem href={item.href} active={pathname === item.href}>
+                    <i class="icon-[tabler--point] size-2.5" />
+                    <span class="text-xs font-medium">{item.label}</span>
+                  </NavItem>
+                ))}
+              </div>
+            </NavItem>
+          ) : null}--> 
+        </>
+      ))
+    }
+  </nav>
+</Navigation>
+
+<style lang="postcss">
+  .scrollbar::-webkit-scrollbar {
+    @apply w-1.5
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+import type { Collection } from '@/pages/api/collection'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import Collections from './_partials/collections.svelte'
+
+const PER_PAGE = 9
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const currentPage = +(Astro.url.searchParams.get('page') || '1')
+
+const getCount = db
+  .prepare('SELECT COUNT(*) AS total FROM collections')
+  .first<number>('total')
+
+const getCollections = db
+  .prepare('SELECT * FROM collections LIMIT ? OFFSET ?')
+  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .run<Collection>()
+
+const [count, collections] = await Promise.all([getCount, getCollections])
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <Collections
+      collections={collections.results}
+      count={count ?? 0}
+      currentPage={currentPage}
+      perPage={PER_PAGE}
+      client:load
+    />
+  </main>
+</AdminLayout>

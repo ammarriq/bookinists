@@ -1,0 +1,12 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const db = Astro.locals.runtime.env.SITE_DB
+const result = await db.prepare('SELECT *  FROM users').all()
+---
+
+<BaseLayout title="Welcome to Astro.">
+  <main>
+    {JSON.stringify(result, null, 2)}
+  </main>
+</BaseLayout>

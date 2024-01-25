@@ -1,0 +1,37 @@
+---
+import type { Author } from '@/pages/api/author'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import Authors from './_partials/authors.svelte'
+
+const PER_PAGE = 9
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const currentPage = +(Astro.url.searchParams.get('page') || '1')
+
+const getCount = db
+  .prepare('SELECT COUNT(*) AS total FROM authors')
+  .first<number>('total')
+
+const getAuthors = db
+  .prepare('SELECT * FROM authors LIMIT ? OFFSET ?')
+  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .run<Author>()
+
+const [count, authors] = await Promise.all([getCount, getAuthors])
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <Authors
+      authors={authors.results}
+      count={count ?? 0}
+      currentPage={currentPage}
+      perPage={PER_PAGE}
+      client:load
+    />
+  </main>
+</AdminLayout>

@@ -1,0 +1,37 @@
+---
+import type { Location } from '@/pages/api/location'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import LocationTable from './_partials/location-table.svelte'
+
+const PER_PAGE = 9
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const currentPage = +(Astro.url.searchParams.get('page') || '1')
+
+const getCount = db
+  .prepare('SELECT COUNT(*) AS total FROM locations')
+  .first<number>('total')
+
+const getLocations = db
+  .prepare('SELECT * FROM locations LIMIT ? OFFSET ?')
+  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .run<Location>()
+
+const [count, locations] = await Promise.all([getCount, getLocations])
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <LocationTable
+      locations={locations.results}
+      count={count ?? 0}
+      currentPage={currentPage}
+      perPage={PER_PAGE}
+      client:load
+    />
+  </main>
+</AdminLayout>

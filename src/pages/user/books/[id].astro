@@ -1,0 +1,56 @@
+---
+import type { Book } from '@/pages/api/book'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import BookDetails from './_book-partials/book-details.svelte'
+import EditionTable from './_edition-partials/edition-table.svelte'
+
+const PER_PAGE = 10
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const currentPage = +(Astro.url.searchParams.get('page') || '1')
+
+const getCount = db
+  .prepare('SELECT COUNT(*) AS total FROM books')
+  .first<number>('total')
+
+const getBook = db
+  .prepare(
+    `SELECT books.*, authors.name as author_name FROM books
+    LEFT JOIN books_authors ON books_authors.book_id = books.id
+    LEFT JOIN authors ON authors.id = books_authors.author_id
+    WHERE books.id=?`,
+  )
+  .bind(Astro.params.id)
+  .run<Book & { author_name: string }>()
+
+const getEditions = db
+  .prepare('SELECT * FROM books LIMIT ? OFFSET ?')
+  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .run<Book>()
+
+const [count, book, editions] = await Promise.all([
+  getCount,
+  getBook,
+  getEditions,
+])
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <BookDetails books={book.results} />
+  </main>
+
+  <main class="px-4 py-6 pt-0">
+    <EditionTable
+      books={editions.results}
+      count={count ?? 0}
+      currentPage={currentPage}
+      perPage={PER_PAGE}
+      client:load
+    />
+  </main>
+</AdminLayout>

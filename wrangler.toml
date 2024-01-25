@@ -1,0 +1,14 @@
+name = "bookinists"
+# main = "src/index.js"
+compatibility_date = "2023-08-23"
+
+[[d1_databases]]
+binding = "SITE_DB" # i.e. available in your Worker on env.SITE_DB
+database_name = "site"
+database_id = "06249c59-11ff-4369-a2a2-cc1b863790e8"
+migrations_table = "users"
+migrations_dir = ".wrangler/migrations"
+
+[[r2_buckets]]
+binding = "SITE_BUCKET"
+bucket_name = "bookinist-01"

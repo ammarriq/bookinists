@@ -1,0 +1,37 @@
+---
+import type { User } from '@/lib/auth'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import UserTable from './_partials/user-table.svelte'
+
+const PER_PAGE = 10
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const currentPage = +(Astro.url.searchParams.get('page') || '1')
+
+const getCount = db
+  .prepare('SELECT COUNT(*) AS total FROM users')
+  .first<number>('total')
+
+const getUsers = db
+  .prepare('SELECT * FROM users LIMIT ? OFFSET ?')
+  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .run<User>()
+
+const [count, users] = await Promise.all([getCount, getUsers])
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <UserTable
+      users={users.results}
+      count={count ?? 0}
+      currentPage={currentPage}
+      perPage={PER_PAGE}
+      client:load
+    />
+  </main>
+</AdminLayout>

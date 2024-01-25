@@ -1,0 +1,25 @@
+---
+import { Toaster } from 'svelte-sonner'
+import Header from './partials/Header.astro'
+import Sidebar from './partials/Sidebar.astro'
+import BaseLayout from './BaseLayout.astro'
+
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<BaseLayout title={title}>
+  <main class="relative bg-slate-100">
+    <Header />
+    <Sidebar />
+
+    <div class="pl-0 lg:pl-56 pt-11 min-h-screen">
+      <slot />
+    </div>
+  </main>
+
+  <Toaster richColors client:load />
+</BaseLayout>
