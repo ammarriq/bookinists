@@ -3,13 +3,19 @@ import NavItem from './NavItem.svelte'
 import Navigation from './Sidebar.svelte'
 
 const pathname = Astro.url.pathname
+const user = Astro.locals.user
 
-const navLinks = [
+
+const adminLinks: typeof userLinks = [
   {
     icon: 'icon-[tabler--shield-lock]',
     label: 'Admin',
     href: '/admin',
-  },
+  }
+]
+
+const userLinks = [
+  {},
   {
     icon: 'icon-[tabler--book-2]',
     label: 'Books',
@@ -85,6 +91,8 @@ const navLinks = [
     href: '/user/contacts',
   },
 ]
+
+const navLinks = user?.role === "admin" ? adminLinks.concat(userLinks) : []
 ---
 
 <Navigation client:load>
@@ -93,7 +101,7 @@ const navLinks = [
     <h1 class="text-xl font-bold text-center">Bookinists</h1>
   </a>
 
-  <nav class="scrollbar grid gap-3 content-start mt-6 overflow-y-auto px-5">
+  <nav class="scrollbar grid gap-3 content-start mt-10 overflow-y-auto px-5">
     {
       navLinks.map((link) => (
         <>
