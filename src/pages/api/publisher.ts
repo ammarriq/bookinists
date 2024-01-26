@@ -51,7 +51,7 @@ export const POST = createActions({
       name: result.output.name,
       logo: result.output.logo,
       info: result.output.info,
-      country_id: result.output.country_id,
+      country_id: result.output.country_id || null,
       created_on: Date.now(),
     }
 
@@ -92,7 +92,7 @@ export const POST = createActions({
       name: result.output.name,
       logo: result.output.logo,
       info: result.output.info,
-      country_id: result.output.country_id,
+      country_id: result.output.country_id || null,
     }
 
     await db
