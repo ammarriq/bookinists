@@ -4,7 +4,7 @@
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
-  import { Dialog, Label, Select, Switch } from 'bits-ui'
+  import { Dialog, Select, Switch } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
   import { favorite_contact } from '@/lib/constants'
   import Field from '@/components/field.svelte'
