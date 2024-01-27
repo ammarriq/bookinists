@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Book } from '@/pages/api/book'
 
-  import { Avatar } from 'bits-ui'
   import { stars } from '@/lib/utils'
   import BookActions from './book-actions.svelte'
 
@@ -17,12 +16,6 @@
 <tr class="text-sm border-b">
   <td class="py-2.5 px-4 whitespace-nowrap">
     <a href="/user/books/{book.id}" class="flex gap-2 items-center min-w-max">
-      <Avatar.Root class="flex width-8 items-center justify-center">
-        <Avatar.Image src={book.url} alt="@huntabyte" />
-        <Avatar.Fallback class="flex items-center justify-center width-8">
-          <i class="icon-[tabler--book] size-6" />
-        </Avatar.Fallback>
-      </Avatar.Root>
       <div>
         <p class="text-slate-900 font-medium">
           {book.title ?? ''}
