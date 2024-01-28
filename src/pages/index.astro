@@ -2,11 +2,16 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const db = Astro.locals.runtime.env.SITE_DB
-const result = await db.prepare('SELECT *  FROM users').all()
+const { results } = await db
+  .prepare(
+    `SELECT editions_images.created_on AS editions_creation_date, * FROM editions
+    LEFT JOIN editions_images ON editions.id = editions_images.edition_id`,
+  )
+  .all()
 ---
 
 <BaseLayout title="Welcome to Astro.">
-  <main>
-    {JSON.stringify(result, null, 2)}
-  </main>
+  <pre>
+    {JSON.stringify(results, null, 2)}
+  </pre>
 </BaseLayout>

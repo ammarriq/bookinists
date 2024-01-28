@@ -1,25 +1,24 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Book } from '@/pages/api/book'
+  import type { Edition } from '@/pages/api/edition'
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
   import { Dialog, Select, DropdownMenu as Dropdown } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
-  import { read_status } from '@/lib/constants'
   import Field from '@/components/field.svelte'
 
-  export let book: Book
+  export let edition: Edition
 
   let submitting = false
   let dialogOpen = false
 
   let deleteForm: HTMLFormElement
-  let errors: Record<keyof Book, string[]> | null = null
+  let errors: Record<keyof Edition, string[]> | null = null
 
-  const dispatch = createEventDispatcher<{ edit: Book; delete: string }>()
+  const dispatch = createEventDispatcher<{ edit: Edition; delete: string }>()
 
-  const editBook: FormEventHandler<HTMLFormElement> = async (e) => {
+  const editEdition: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
 
     const form = e.currentTarget
@@ -31,15 +30,15 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Book>
+    const json = (await res.json()) as FetchResponse<Edition>
     if (!json.success) return (errors = json.errors)
 
     dialogOpen = false
     dispatch('edit', json.data)
   }
 
-  const deleteBook = async () => {
-    if (!confirm('Are you sure you wanna delete the book?')) return
+  const deleteEdition = async () => {
+    if (!confirm('Are you sure you wanna delete the edition?')) return
     submitting = true
 
     const form = deleteForm
@@ -51,12 +50,11 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Book>
+    const json = (await res.json()) as FetchResponse<Edition>
     if (!json.success) return (errors = json.errors)
 
     dispatch('delete', json.data.id)
   }
-
 </script>
 
 <Dropdown.Root>
@@ -77,16 +75,16 @@
     </Dropdown.Item>
     <Dropdown.Item
       class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-      on:click={deleteBook}
+      on:click={deleteEdition}
       disabled={submitting}
     >
       <form
-        action="/api/book?delete"
+        action="/api/edition?delete"
         method="post"
         bind:this={deleteForm}
         on:submit|preventDefault
       >
-        <input type="hidden" name="id" value={book.id} />
+        <input type="hidden" name="id" value={edition.id} />
         <button type="submit" disabled={submitting}>Delete</button>
       </form>
     </Dropdown.Item>
@@ -116,14 +114,14 @@
         />
 
         <Dialog.Title class="space-y-1 mb-4">
-          <h2 class="text-base font-semibold">Edit Book</h2>
+          <h2 class="text-base font-semibold">Edit Edition</h2>
         </Dialog.Title>
 
-        <form
-          action="/api/book?edit"
+        <!-- <form
+          action="/api/edition?edit"
           method="post"
           class="space-y-4"
-          on:submit|preventDefault={editBook}
+          on:submit|preventDefault={editEdition}
         >
           <Field label="Title" error={errors?.title}>
             <input
@@ -132,7 +130,7 @@
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.title}
-              value={book.title}
+              value={edition.title}
             />
           </Field>
 
@@ -143,7 +141,7 @@
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.url}
-              value={book.url}
+              value={edition.url}
             />
           </Field>
 
@@ -154,7 +152,7 @@
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.excerpt}
-              value={book.excerpt}
+              value={edition.excerpt}
             />
           </Field>
 
@@ -163,7 +161,7 @@
               portal=".dialog"
               selected={read_status
                 .map((o) => ({ value: o, label: o }))
-                .find((o) => o.value === book.read_status)}
+                .find((o) => o.value === edition.read_status)}
             >
               <Select.Trigger
                 class="flex items-center justify-between border w-full px-3
@@ -203,7 +201,7 @@
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.rating}
-              value={book.rating}
+              value={edition.rating}
             />
           </Field>
 
@@ -214,12 +212,12 @@
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.review}
-              value={book.review}
+              value={edition.review}
             />
           </Field>
 
-          <input type="hidden" name="id" value={book.id} />
-          <input type="hidden" name="genre_id" value={book.genre_id} />
+          <input type="hidden" name="id" value={edition.id} />
+          <input type="hidden" name="genre_id" value={edition.genre_id} />
 
           <button
             class="flex items-center justify-center text-sm text-white font-medium
@@ -232,7 +230,7 @@
             {/if}
             Submit
           </button>
-        </form>
+        </form> -->
       </div>
     </Dialog.Content>
   </Dialog.Portal>

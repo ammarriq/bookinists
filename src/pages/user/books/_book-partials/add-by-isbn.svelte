@@ -3,8 +3,8 @@
   import type { ISBNBook } from '@/lib/types'
   import type { Book } from '@/pages/api/book'
 
-  import { createEventDispatcher } from 'svelte' //@ts-ignore
-  import isbn from 'node-isbn'
+  import { createEventDispatcher } from 'svelte'
+  import { toast } from 'svelte-sonner'
   import Field from '@/components/field.svelte'
 
   export let dialogOpen: boolean
@@ -23,7 +23,16 @@
     }
 
     submitting = true
-    book = await isbn.resolve(isbnValue)
+
+    const res = await fetch(`/api/isbn?value=${isbnValue}`)
+    const json = (await res.json()) as FetchResponse<ISBNBook>
+
+    if (!json.success) {
+      const error = json.errors.message?.join(', ')
+      return toast.error(error || 'Something went wrong. Try again later.')
+    }
+
+    book = json.data
     submitting = false
   }
 
@@ -111,6 +120,24 @@
       </a>
     </Field>
 
+    <Field label="Pages">
+      <input type="hidden" name="pages" value={book.pageCount ?? 0} />
+      <p class="text-sm text-slate-600/90">{book.pageCount}</p>
+    </Field>
+
+    <Field label="Language">
+      <input type="hidden" name="language_iso" value={book.language} />
+      <p class="text-sm text-slate-600/90">{book.language}</p>
+    </Field>
+
+    {#each book.industryIdentifiers as isbn, i (i)}
+      {@const isbnName = isbn.type.toLowerCase().replace('_', '')}
+      <Field label={isbn.type.replace('_', '-')}>
+        <input type="hidden" name={isbnName} value={isbn.identifier} />
+        <p class="text-sm text-slate-600/90">{isbn.identifier}</p>
+      </Field>
+    {/each}
+
     <Field label="Rating" error={errors?.rating}>
       <input type="hidden" name="rating" value={book.averageRating ?? 0} />
       <p class="text-sm text-slate-600/90 {book.averageRating ? '' : 'italic'}">
@@ -119,10 +146,10 @@
     </Field>
 
     <Field label="Tag">
-      {#each book.categories as category, i (i)}
+      {#each book.categories ?? [] as category, i (i)}
         <input type="hidden" name="tags.{i}" value={category} />
       {/each}
-      <p class="text-sm text-slate-600/90">{book.categories.join(', ')}</p>
+      <p class="text-sm text-slate-600/90">{book.categories?.join(', ')}</p>
     </Field>
 
     <Field label="Authors">

@@ -9,7 +9,7 @@ export type ISBNBook = {
         thumbnail: string
       }
     | undefined
-  industryIdentifiers: string[]
+  industryIdentifiers: { type: string; identifier: string }[]
   infoLink: string
   language: string
   pageCount?: number | undefined

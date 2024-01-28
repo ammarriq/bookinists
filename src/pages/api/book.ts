@@ -1,7 +1,3 @@
-import type { Author } from './author'
-import type { Tag } from './tag'
-import type { Publisher } from './publisher'
-
 import { read_status } from '@/lib/constants'
 import { createActions } from '@/lib/utils'
 import { decode } from 'decode-formdata'
@@ -47,11 +43,16 @@ const IsbnSchema = merge([
     tags: array(string()),
     authors: array(string()),
     publisher: string(),
+    isbn: optional(string()),
+    isbn13: optional(string()),
+    pages: number(),
+    thumbnail: string([url()]),
+    language_iso: string(),
   }),
 ])
 
 const decoder = {
-  numbers: ['rating'],
+  numbers: ['rating', 'pages'],
   arrays: ['tags', 'authors'], // isbn decoder
 }
 
@@ -183,6 +184,24 @@ export const POST = createActions({
       publisher_stmt.bind(...Object.values(publisher)),
     ])
 
+    const edition = {
+      id: generateId(15),
+      date: Date.now(),
+      book_id: book.id,
+      publisher_id: publisher.id,
+      isbn: result.output.isbn ?? '',
+      isbn13: result.output.isbn13 ?? '',
+      pages: result.output.pages,
+      language_iso: result.output.language_iso,
+      created_on: Date.now(),
+    }
+
+    const edition_stmt = db.prepare(
+      `INSERT INTO editions
+      (id, date, book_id, publisher_id, isbn, isbn13, pages, language_iso, created_on) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+
     const books_tags_stmt = db.prepare(
       `INSERT INTO books_tags
       (book_id, tag_id)
@@ -196,9 +215,27 @@ export const POST = createActions({
     )
 
     await db.batch([
+      edition_stmt.bind(...Object.values(edition)),
       ...authors.map((a) => books_authors_stmt.bind(book.id, a.id)),
       ...tags.map((a) => books_tags_stmt.bind(book.id, a.id)),
     ])
+
+    const edition_image = {
+      id: generateId(15),
+      edition_id: edition.id,
+      image: result.output.thumbnail,
+      type: 'cover',
+      created_on: Date.now(),
+    }
+
+    await db
+      .prepare(
+        `INSERT INTO editions_images
+        (id, edition_id, image, type, created_on) 
+        VALUES (?, ?, ?, ?, ?)`
+      )
+      .bind(...Object.values(edition_image))
+      .run()
 
     return Response.json(
       { data: book, success: true, errors: null },

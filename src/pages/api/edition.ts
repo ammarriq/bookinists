@@ -29,6 +29,7 @@ import {
   merge,
   array,
   boolean,
+  url,
 } from 'valibot'
 
 const EditionSchema = object({
@@ -37,8 +38,8 @@ const EditionSchema = object({
   book_id: nullable(string()),
   publisher_id: nullable(string()),
   country_id: nullable(string()),
-  isbn: string([minLength(1, 'ISBN is required')]),
-  isbn13: string([minLength(1, 'ISBN is required')]),
+  isbn: optional(string()),
+  isbn13: optional(string()),
   status: picklist(status, 'Invalid status selected'),
   protection: picklist(protection, 'Invalid value selected'),
   pages: number(),
@@ -77,16 +78,23 @@ const EditionSchema = object({
 })
 
 const IsbnSchema = merge([
-  EditionSchema,
+  pick(EditionSchema, [
+    'date',
+    'book_id',
+    'isbn',
+    'isbn13',
+    'language_iso',
+    'pages',
+  ]),
   object({
-    tags: array(string()),
-    authors: array(string()),
     publisher: string(),
+    thumbnail: string([url()]),
   }),
 ])
 
 const decoder = {
   numbers: [
+    'date',
     'pages',
     'msrp',
     'total_printed',
@@ -140,8 +148,8 @@ export const POST = createActions({
       book_id: result.output.book_id || null,
       publisher_id: result.output.publisher_id || null,
       country_id: result.output.country_id || null,
-      isbn: result.output.isbn,
-      isbn13: result.output.isbn13,
+      isbn: result.output.isbn ?? '',
+      isbn13: result.output.isbn13 ?? '',
       status: result.output.status,
       protection: result.output.protection,
       pages: result.output.pages,
@@ -208,7 +216,7 @@ export const POST = createActions({
 
     const formData = await request.formData()
     const data = decode(formData, decoder)
-    const result = safeParse(omit(IsbnSchema, ['id']), data)
+    const result = safeParse(IsbnSchema, data)
 
     if (!result.success) {
       const errors = flatten(result.issues).nested
@@ -217,70 +225,6 @@ export const POST = createActions({
         { status: 400 }
       )
     }
-
-    const edition: Edition = {
-      id: generateId(15),
-      date: Date.now(),
-      book_id: result.output.book_id || null,
-      publisher_id: result.output.publisher_id || null,
-      country_id: result.output.country_id || null,
-      isbn: result.output.isbn,
-      isbn13: result.output.isbn13,
-      status: result.output.status,
-      protection: result.output.protection,
-      pages: result.output.pages,
-      msrp: result.output.msrp,
-      language_iso: result.output.language_iso,
-      binding: result.output.binding,
-      total_printed: result.output.total_printed,
-      printing: result.output.printing,
-      edition: result.output.edition,
-      is_limited: result.output.is_limited ? 1 : 0,
-      limited_num: result.output.limited_num,
-      limited_total: result.output.limited_total,
-      is_signed: result.output.is_signed ? 1 : 0,
-      signature_type: result.output.signature_type,
-      signature_page: result.output.signature_page,
-      need_repair: result.output.need_repair ? 1 : 0,
-      description: result.output.description,
-      book_condition: result.output.book_condition,
-      book_condition_notes: result.output.book_condition_notes,
-      jacket_condition: result.output.jacket_condition,
-      jacket_condition_notes: result.output.jacket_condition_notes,
-      width: result.output.width,
-      height: result.output.height,
-      depth: result.output.depth,
-      purchase_price: result.output.purchase_price,
-      purchase_date: result.output.purchase_date,
-      purchase_invoice: result.output.purchase_invoice,
-      seller_id: result.output.seller_id || null,
-      sell_price: result.output.sell_price,
-      sell_date: result.output.sell_date,
-      buyer_id: result.output.buyer_id || null,
-      lend_status: result.output.lend_status,
-      lender_id: result.output.lender_id || null,
-      lending_time: result.output.lending_time,
-      created_on: Date.now(),
-    }
-
-    const authors: Author[] = result.output.authors.map((a) => ({
-      id: generateId(15),
-      name: a,
-      avatar: '',
-      info: '',
-      country_id: null,
-      created_on: Date.now(),
-    }))
-
-    const tags: Tag[] = result.output.tags.map((a) => ({
-      id: generateId(15),
-      name: a,
-      icon: '',
-      description: '',
-      text_color: '',
-      bg_color: '',
-      created_on: Date.now(),
-    }))
 
     const publisher: Publisher = {
       id: generateId(15),
@@ -291,59 +235,52 @@ export const POST = createActions({
       created_on: Date.now(),
     }
 
-    const book_stmt = db.prepare(
-      `INSERT INTO books
-      (id, date, book_id, publisher_id, country_id, isbn, isbn13, status, protection, pages, msrp,
-        language_iso, binding, total_printed, printing, edition, is_limited, limited_num, limited_total,
-        is_signed, signature_type, signature_page, need_repair, description, book_condition,
-        book_condition_notes, jacket_condition, jacket_condition_notes, width, height, depth,
-        purchase_price, purchase_date, purchase_invoice, seller_id, sell_price, sell_date, buyer_id,
-        lend_status, lender_id, lending_time, created_on,) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,)`
-    )
+    const edition = {
+      id: generateId(15),
+      date: Date.now(),
+      book_id: result.output.book_id || null,
+      publisher_id: publisher.id,
+      isbn: result.output.isbn ?? '',
+      isbn13: result.output.isbn13 ?? '',
+      pages: result.output.pages,
+      language_iso: result.output.language_iso,
+      created_on: Date.now(),
+    }
 
-    const author_stmt = db.prepare(
-      `INSERT INTO authors
-      (id, name, avatar, info, country_id, created_on) 
-      VALUES (?, ?, ?, ?, ?, ?)`
-    )
+    const edition_image = {
+      id: generateId(15),
+      edition_id: edition.id,
+      image: result.output.thumbnail,
+      type: 'cover',
+      created_on: Date.now(),
+    }
 
-    const tag_stmt = db.prepare(
-      `INSERT INTO tags
-      (id, name, icon, description, text_color, bg_color, created_on) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`
-    )
+    await db
+      .prepare(
+        `INSERT INTO publishers
+        (id, name, logo, info, country_id, created_on) 
+        VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .bind(...Object.values(publisher))
+      .run()
 
-    const publisher_stmt = db.prepare(
-      `INSERT INTO publishers
-      (id, name, logo, info, country_id, created_on) 
-      VALUES (?, ?, ?, ?, ?, ?)`
-    )
+    await db
+      .prepare(
+        `INSERT INTO editions
+        (id, date, book_id, publisher_id, isbn, isbn13, pages, language_iso, created_on) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(...Object.values(edition))
+      .run()
 
-    await db.batch([
-      book_stmt.bind(...Object.values(edition)),
-      ...authors.map((a) => author_stmt.bind(...Object.values(a))),
-      ...tags.map((a) => tag_stmt.bind(...Object.values(a))),
-      publisher_stmt.bind(...Object.values(publisher)),
-    ])
-
-    const books_tags_stmt = db.prepare(
-      `INSERT INTO books_tags
-      (book_id, tag_id)
-      VALUES (?, ?)`
-    )
-
-    const books_authors_stmt = db.prepare(
-      `INSERT INTO books_authors
-      (book_id, author_id)
-      VALUES (?, ?)`
-    )
-
-    await db.batch([
-      ...authors.map((a) => books_authors_stmt.bind(edition.id, a.id)),
-      ...tags.map((a) => books_tags_stmt.bind(edition.id, a.id)),
-    ])
+    await db
+      .prepare(
+        `INSERT INTO editions_images
+        (id, edition_id, image, type, created_on) 
+        VALUES (?, ?, ?, ?, ?)`
+      )
+      .bind(...Object.values(edition_image))
+      .run()
 
     return Response.json(
       { data: edition, success: true, errors: null },
@@ -374,8 +311,8 @@ export const POST = createActions({
       book_id: result.output.book_id || null,
       publisher_id: result.output.publisher_id || null,
       country_id: result.output.country_id || null,
-      isbn: result.output.isbn,
-      isbn13: result.output.isbn13,
+      isbn: result.output.isbn ?? '',
+      isbn13: result.output.isbn13 ?? '',
       status: result.output.status,
       protection: result.output.protection,
       pages: result.output.pages,

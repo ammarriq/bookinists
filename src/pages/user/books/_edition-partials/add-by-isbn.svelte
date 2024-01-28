@@ -1,19 +1,20 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
   import type { ISBNBook } from '@/lib/types'
-  import type { Book } from '@/pages/api/book'
+  import type { Edition } from '@/pages/api/edition'
 
-  import { createEventDispatcher } from 'svelte' //@ts-ignore
-  import isbn from 'node-isbn'
+  import { createEventDispatcher } from 'svelte'
+  import { toast } from 'svelte-sonner'
   import Field from '@/components/field.svelte'
 
   export let dialogOpen: boolean
+  export let book_id = ''
 
-  const dispatch = createEventDispatcher<{ submit: Book }>()
+  const dispatch = createEventDispatcher<{ submit: Edition }>()
 
-  let book: ISBNBook | null = null
+  let edition: ISBNBook | null = null
   let submitting = false
-  let errors: Record<keyof Book, string[]> | null = null
+  let errors: Record<keyof Edition, string[]> | null = null
 
   const getBookByISBN: FormEventHandler<HTMLFormElement> = async (e) => {
     const isbnValue = String(e.currentTarget.isbn.value)
@@ -23,7 +24,16 @@
     }
 
     submitting = true
-    book = await isbn.resolve(isbnValue)
+
+    const res = await fetch(`/api/isbn?value=${isbnValue}`)
+    const json = (await res.json()) as FetchResponse<ISBNBook>
+
+    if (!json.success) {
+      const error = json.errors.message?.join(', ')
+      return toast.error(error || 'Something went wrong. Try again later.')
+    }
+
+    edition = json.data
     submitting = false
   }
 
@@ -39,14 +49,14 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Book>
+    const json = (await res.json()) as FetchResponse<Edition>
     if (!json.success) return (errors = json.errors)
 
     dispatch('submit', json.data)
     dialogOpen = false
   }
 
-  $: console.log(book)
+  $: console.log(edition)
 </script>
 
 <form on:submit|preventDefault={getBookByISBN}>
@@ -80,68 +90,59 @@
   </div>
 {/if}
 
-{#if !submitting && book}
+{#if !submitting && edition}
   <form
-    action="/api/book?add_by_isbn"
+    action="/api/edition?add_by_isbn"
     method="post"
     class="mt-4 grid grid-cols-2 gap-4"
     on:submit|preventDefault={submit}
   >
-    {#if book.imageLinks?.thumbnail}
+    {#if edition.imageLinks?.thumbnail}
       <img
         class="col-span-2 mx-auto"
-        src={book.imageLinks.thumbnail}
-        alt={book.title}
+        src={edition.imageLinks.thumbnail}
+        alt={edition.title}
       />
     {/if}
 
-    <Field label="Title" error={errors?.title}>
-      <input type="hidden" name="title" value={book.title} />
-      <p class="text-sm text-slate-600/90">{book.title}</p>
+    <Field label="Pages" error={errors?.pages}>
+      <input type="hidden" name="pages" value={edition.pageCount ?? 0} />
+      <p class="text-sm text-slate-600/90">{edition.pageCount}</p>
     </Field>
 
-    <Field label="URL" error={errors?.url}>
-      <input type="hidden" name="url" value={book.infoLink} />
-      <a
-        href={book.infoLink}
-        class="underline block text-sm text-slate-600/90"
-        target="_blank"
-      >
-        Go to url
-      </a>
+    <Field label="Language" error={errors?.language_iso}>
+      <input type="hidden" name="language_iso" value={edition.language} />
+      <p class="text-sm text-slate-600/90">{edition.language}</p>
     </Field>
 
-    <Field label="Rating" error={errors?.rating}>
-      <input type="hidden" name="rating" value={book.averageRating ?? 0} />
-      <p class="text-sm text-slate-600/90 {book.averageRating ? '' : 'italic'}">
-        {book.averageRating ?? 'N/A'}
-      </p>
-    </Field>
+    {#each edition.industryIdentifiers as isbn, i (i)}
+      {@const isbnName = isbn.type.toLowerCase().replace('_', '')}
+      <Field label={isbn.type.replace('_', '-')}>
+        <input type="hidden" name={isbnName} value={isbn.identifier} />
+        <p class="text-sm text-slate-600/90">{isbn.identifier}</p>
+      </Field>
+    {/each}
 
-    <Field label="Tag">
-      {#each book.categories as category, i (i)}
-        <input type="hidden" name="tags.{i}" value={category} />
-      {/each}
-      <p class="text-sm text-slate-600/90">{book.categories.join(', ')}</p>
-    </Field>
-
-    <Field label="Authors">
-      {#each book.authors as author, i (i)}
-        <input type="hidden" name="authors.{i}" value={author} />
-      {/each}
-      <p class="text-sm text-slate-600/90">{book.authors.join(', ')}</p>
+    <Field label="Published date" error={errors?.publisher_id}>
+      <input
+        type="hidden"
+        name="date"
+        value={new Date(edition.publishedDate).getTime()}
+      />
+      <p class="text-sm text-slate-600/90">{edition.publishedDate}</p>
     </Field>
 
     <Field label="Publisher">
-      <input type="hidden" name="publisher" value={book.publisher} />
-      <p class="text-sm text-slate-600/90">{book.publisher}</p>
+      <input type="hidden" name="publisher" value={edition.publisher} />
+      <p class="text-sm text-slate-600/90">{edition.publisher}</p>
     </Field>
 
-    <input type="hidden" name="thumbnail" value={book.imageLinks?.thumbnail} />
-    <input type="hidden" name="read_status" value="unread" />
-    <input type="hidden" name="review" />
-    <input type="hidden" name="excerpt" />
-    <input type="hidden" name="genre_id" />
+    <input
+      type="hidden"
+      name="thumbnail"
+      value={edition.imageLinks?.thumbnail}
+    />
+    <input type="hidden" name="book_id" value={book_id} />
 
     <button
       class="flex items-center justify-center text-sm text-white font-medium

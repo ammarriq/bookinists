@@ -6,6 +6,7 @@
   import AddByIsbn from './add-by-isbn.svelte'
 
   export let dialogOpen = false
+  export let book_id = ''
 
   let tab = 'manual'
 </script>
@@ -33,7 +34,7 @@
         />
 
         <Dialog.Title class="space-y-1">
-          <h2 class="text-base font-semibold">Add Book</h2>
+          <h2 class="text-base font-semibold">Add Edition</h2>
         </Dialog.Title>
 
         <div class="flex border rounded-md shadow-sm my-4">
@@ -56,11 +57,11 @@
         </div>
 
         {#if tab === 'manual'}
-          <AddByManual bind:dialogOpen on:submit />
+          <AddByManual {book_id} bind:dialogOpen on:submit />
         {/if}
 
         {#if tab === 'isbn'}
-          <AddByIsbn bind:dialogOpen on:submit />
+          <AddByIsbn {book_id} bind:dialogOpen on:submit />
         {/if}
       </div>
     </Dialog.Content>

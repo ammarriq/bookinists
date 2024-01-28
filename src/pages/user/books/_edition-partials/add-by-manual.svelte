@@ -1,19 +1,19 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Book } from '@/pages/api/book'
+  import type { Edition } from '@/pages/api/edition'
 
   import { createEventDispatcher } from 'svelte'
   import { fly } from 'svelte/transition'
   import { Select } from 'bits-ui'
-  import { read_status } from '@/lib/constants'
   import Field from '@/components/field.svelte'
 
   export let dialogOpen: boolean
+  export let book_id = ''
 
   let submitting = false
-  let errors: Record<keyof Book, string[]> | null = null
+  let errors: Record<keyof Edition, string[]> | null = null
 
-  const dispatch = createEventDispatcher<{ submit: Book }>()
+  const dispatch = createEventDispatcher<{ submit: Edition }>()
 
   const submit: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
@@ -27,7 +27,7 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Book>
+    const json = (await res.json()) as FetchResponse<Edition>
     if (!json.success) return (errors = json.errors)
 
     dispatch('submit', json.data)
@@ -35,12 +35,13 @@
   }
 </script>
 
-<form
+<!-- <form
   action="/api/book?add"
   method="post"
   class="space-y-4"
   on:submit|preventDefault={submit}
 >
+  <input name="book_id" value={book_id} />
   <Field label="Title" error={errors?.title}>
     <input
       type="text"
@@ -135,4 +136,4 @@
     {/if}
     Submit
   </button>
-</form>
+</form> -->

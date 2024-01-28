@@ -1,5 +1,6 @@
 ---
 import type { Book } from '@/pages/api/book'
+import type { Edition } from '@/pages/api/edition'
 
 import AdminLayout from '@/layouts/AdminLayout.astro'
 import BookDetails from './_book-partials/book-details.svelte'
@@ -12,9 +13,11 @@ const user = Astro.locals.user
 if (!user) return Astro.redirect('/login')
 
 const currentPage = +(Astro.url.searchParams.get('page') || '1')
+const book_id = Astro.params.id
 
 const getCount = db
-  .prepare('SELECT COUNT(*) AS total FROM books')
+  .prepare('SELECT COUNT(*) AS total FROM editions WHERE book_id=?')
+  .bind(book_id)
   .first<number>('total')
 
 const getBook = db
@@ -24,19 +27,23 @@ const getBook = db
     LEFT JOIN authors ON authors.id = books_authors.author_id
     WHERE books.id=?`,
   )
-  .bind(Astro.params.id)
+  .bind(book_id)
   .run<Book & { author_name: string }>()
 
 const getEditions = db
-  .prepare('SELECT * FROM books LIMIT ? OFFSET ?')
-  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Book>()
+  .prepare('SELECT * FROM editions WHERE book_id=? LIMIT ? OFFSET ?')
+  .bind(book_id, PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .run<Edition>()
 
 const [count, book, editions] = await Promise.all([
   getCount,
   getBook,
   getEditions,
 ])
+
+if (!book.results.length) {
+  return Astro.redirect('/404', 404)
+}
 ---
 
 <AdminLayout title="Admin | Bookinists">
@@ -46,7 +53,8 @@ const [count, book, editions] = await Promise.all([
 
   <main class="px-4 py-6 pt-0">
     <EditionTable
-      books={editions.results}
+      book_id={book_id}
+      editions={editions.results}
       count={count ?? 0}
       currentPage={currentPage}
       perPage={PER_PAGE}

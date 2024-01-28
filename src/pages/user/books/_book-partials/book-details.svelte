@@ -15,7 +15,7 @@
     {/if}
 
     <div class="flex items-center gap-1 my-3">
-      {#each stars(3.5) as star, i (i)}
+      {#each stars(books[0].rating ?? 0) as star, i (i)}
         <i
           class="text-orange-500 size-4"
           class:icon-[tabler--star-filled]={star === 'full'}
