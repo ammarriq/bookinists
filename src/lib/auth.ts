@@ -36,9 +36,8 @@ export const initGoogleAuth = () =>
 declare module 'lucia' {
   interface Register {
     Lucia: ReturnType<typeof initLucia>
+    DatabaseUserAttributes: User
   }
-
-  interface DatabaseUserAttributes extends User {}
 }
 
 export interface User {
