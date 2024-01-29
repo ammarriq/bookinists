@@ -104,7 +104,6 @@ export const POST = createActions({
   },
   delete: async ({ locals, request }) => {
     const db = locals.runtime.env.SITE_DB
-    const bucket = locals.runtime.env.SITE_BUCKET
 
     if (!locals.user) {
       return new Response(null, { status: 401 })

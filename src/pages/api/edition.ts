@@ -1,5 +1,3 @@
-import type { Author } from './author'
-import type { Tag } from './tag'
 import type { Publisher } from './publisher'
 
 import {
@@ -27,7 +25,6 @@ import {
   type Output,
   pick,
   merge,
-  array,
   boolean,
   url,
 } from 'valibot'

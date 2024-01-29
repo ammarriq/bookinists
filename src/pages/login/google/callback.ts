@@ -1,6 +1,6 @@
 import type { APIContext } from 'astro'
 import type { D1Result } from '@cloudflare/workers-types'
-import type { DatabaseUserAttributes } from 'lucia'
+import type { User as LuciaUser } from '@/lib/auth'
 
 import { OAuth2RequestError } from 'arctic'
 import { initGoogleAuth, initLucia } from '@/lib/auth'
@@ -28,7 +28,7 @@ export const GET = async (context: APIContext) => {
     const { results } = (await db
       .prepare(`SELECT * FROM users WHERE email = ?`)
       .bind(googleUser.email)
-      .run()) as D1Result<DatabaseUserAttributes>
+      .run()) as D1Result<LuciaUser>
 
     const user = results[0]
 

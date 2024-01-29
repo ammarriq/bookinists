@@ -13,7 +13,6 @@ import {
   omit,
   number,
   optional,
-  url,
   picklist,
 } from 'valibot'
 
