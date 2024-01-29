@@ -3,8 +3,8 @@ import type { Book } from '@/pages/api/book'
 import type { Edition } from '@/pages/api/edition'
 
 import AdminLayout from '@/layouts/AdminLayout.astro'
-import BookDetails from './_book-partials/book-details.svelte'
-import EditionTable from './_edition-partials/edition-table.svelte'
+import BookDetails from '../_book-partials/book-details.svelte'
+import EditionTable from '../_edition-partials/edition-table.svelte'
 
 const PER_PAGE = 10
 const db = Astro.locals.runtime.env.SITE_DB

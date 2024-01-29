@@ -73,6 +73,7 @@
       <tbody>
         {#each editionList as edition (edition.id)}
           <EditionRow
+            {book_id}
             {edition}
             on:edit={(e) => {
               const idx = editionList.findIndex((o) => o.id === e.detail.id)

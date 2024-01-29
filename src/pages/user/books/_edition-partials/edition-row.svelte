@@ -4,6 +4,7 @@
   import EditionActions from './edition-actions.svelte'
 
   export let edition: Edition
+  export let book_id: string
 
   const status = {
     unread: 'bg-red-500/20 text-red-500',
@@ -14,7 +15,12 @@
 
 <tr class="text-sm border-b">
   <td class="py-2.5 px-4 whitespace-nowrap">
-    {edition.isbn13}
+    <a
+      href="/user/books/{book_id}/{edition.id}"
+      class="text-slate-900 font-medium min-w-max"
+    >
+      {edition.isbn13 ?? ''}
+    </a>
   </td>
 
   <td class="py-2.5 px-4 whitespace-nowrap">

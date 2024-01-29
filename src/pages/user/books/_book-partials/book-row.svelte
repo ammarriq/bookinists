@@ -15,12 +15,11 @@
 
 <tr class="text-sm border-b">
   <td class="py-2.5 px-4 whitespace-nowrap">
-    <a href="/user/books/{book.id}" class="flex gap-2 items-center min-w-max">
-      <div>
-        <p class="text-slate-900 font-medium">
-          {book.title ?? ''}
-        </p>
-      </div>
+    <a
+      href="/user/books/{book.id}"
+      class="text-slate-900 font-medium min-w-max"
+    >
+      {book.title ?? ''}
     </a>
   </td>
 

@@ -75,15 +75,9 @@ const EditionSchema = object({
 })
 
 const IsbnSchema = merge([
-  pick(EditionSchema, [
-    'date',
-    'book_id',
-    'isbn',
-    'isbn13',
-    'language_iso',
-    'pages',
-  ]),
+  pick(EditionSchema, ['date', 'book_id', 'isbn13', 'language_iso', 'pages']),
   object({
+    isbn10: string(),
     publisher: string(),
     thumbnail: string([url()]),
   }),
@@ -114,7 +108,7 @@ const decoder = {
 }
 
 export type Edition = ToType<
-  Required<Output<typeof EditionSchema>>,
+  Require<Output<typeof EditionSchema>, 'created_on'>,
   boolean,
   number
 >
@@ -237,7 +231,7 @@ export const POST = createActions({
       date: Date.now(),
       book_id: result.output.book_id || null,
       publisher_id: publisher.id,
-      isbn: result.output.isbn ?? '',
+      isbn: result.output.isbn10 ?? '',
       isbn13: result.output.isbn13 ?? '',
       pages: result.output.pages,
       language_iso: result.output.language_iso,

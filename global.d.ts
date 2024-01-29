@@ -27,4 +27,9 @@ declare global {
   > = {
     [Key in keyof Object]: Object[Key] extends FromType ? ToType : Object[Key]
   }
+
+  type Require<Object extends object, Keys extends keyof Object> = Required<
+    Pick<Object, Keys>
+  > &
+    Omit<Object, Keys>
 }
