@@ -53,7 +53,7 @@ const EditionSchema = object({
   signature_type: picklist(signature_type, 'Invalid value selected'),
   signature_page: number(),
   need_repair: boolean(),
-  description: number(),
+  description: string(),
   book_condition: picklist(condition, 'Invalid value selected'),
   book_condition_notes: string(),
   jacket_condition: picklist(condition, 'Invalid value selected'),
