@@ -5,7 +5,7 @@
   export let error: string[] = []
 </script>
 
-<label class="block {clazz}">
+<label class="grid {clazz}">
   {#if label}
     <span class="text-sm font-medium mb-0.5"> {label} </span>
   {/if}

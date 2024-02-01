@@ -1,22 +1,19 @@
 <script lang="ts">
   import dayjs from 'dayjs'
   import Field from '@/components/field.svelte'
+  import CountrySelect from '../../_country-select.svelte'
 
   export let date = new Date().getTime()
   export let isbn = ''
   export let isbn13 = ''
   export let msrp = 0
   export let pages = 0
+  export let country_id = ''
   export let description = ''
 </script>
 
-<div class="grid gap-y-4 border-b pb-6 mt-6">
-  <hgroup>
-    <h3 class="font-semibold tracking-wider">General</h3>
-    <p class="text-slate-500/70 text-xs mt-1">
-      General information related to the edition
-    </p>
-  </hgroup>
+<div class="grid gap-y-4 pb-6 px-6 rounded-md bg-white">
+  <h3 class="font-medium py-4 border-b">General</h3>
 
   <aside class="grid md:grid-cols-2 gap-3">
     <Field label="Date" class="md:col-span-2">
@@ -70,13 +67,17 @@
       />
     </Field>
 
+    <Field label="Country">
+      <CountrySelect {country_id} />
+    </Field>
+
     <Field label="Description" class="md:col-span-2">
       <textarea
         name="description"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900 h-24"
         value={description ?? ''}
-      ></textarea>
+      />
     </Field>
   </aside>
 </div>

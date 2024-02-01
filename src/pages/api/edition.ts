@@ -54,9 +54,15 @@ const EditionSchema = object({
   signature_page: number(),
   need_repair: boolean(),
   description: string(),
-  book_condition: picklist(condition, 'Invalid value selected'),
+  book_condition: picklist(
+    condition.map((o) => o.value),
+    'Invalid value selected'
+  ),
   book_condition_notes: string(),
-  jacket_condition: picklist(condition, 'Invalid value selected'),
+  jacket_condition: picklist(
+    condition.map((o) => o.value),
+    'Invalid value selected'
+  ),
   jacket_condition_notes: string(),
   width: number(),
   height: number(),
@@ -107,7 +113,7 @@ const decoder = {
   booleans: ['is_limited', 'is_signed', 'need_repair'],
 }
 
-export type Edition = ToType<
+export type Edition = SwapType<
   Require<Output<typeof EditionSchema>, 'created_on'>,
   boolean,
   number
