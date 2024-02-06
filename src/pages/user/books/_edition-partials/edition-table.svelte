@@ -20,7 +20,8 @@
     <h2 class="font-semibold">Editions</h2>
 
     <aside
-      class="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto] gap-2 md:ml-auto mt-2 md:mt-0"
+      class="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto_auto]
+      gap-2 md:ml-auto mt-2 md:mt-0"
     >
       <form class="relative grow min-w-full md:min-w-72 col-span-2 sm:col-auto">
         <i
@@ -45,13 +46,22 @@
         <span>Filters</span>
       </button>
 
+      <a
+        href="/user/books/{book_id}/add"
+        class="flex items-center gap-1 text-sm text-white font-medium
+        px-4 py-1.5 border shadow-sm rounded-md
+        whitespace-nowrap bg-slate-900 hover:bg-slate-900/90"
+      >
+        <span>Add book</span>
+      </a>
+
       <button
         on:click={() => (dialogOpen = true)}
         class="flex items-center gap-1 text-sm text-white font-medium
         px-4 py-1.5 border shadow-sm rounded-md
         whitespace-nowrap bg-slate-900 hover:bg-slate-900/90"
       >
-        <span>Add edition</span>
+        <span>Add by ISBN</span>
       </button>
     </aside>
   </header>
@@ -89,8 +99,8 @@
             colspan="5"
             class="text-sm text-center text-slate-500 italic py-2"
           >
-            No edition found</td
-          >
+            No edition found
+          </td>
         {/each}
       </tbody>
     </table>

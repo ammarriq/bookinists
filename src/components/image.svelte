@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { HTMLImgAttributes } from 'svelte/elements'
+  import Url from './url.svelte'
 
   type $$Props = HTMLImgAttributes
   export let src: $$Props['src'] = ''
@@ -26,18 +27,8 @@
   }
 </script>
 
-{#if import.meta.env.PROD}
-  {#await loadImg(`${import.meta.env.PUBLIC_R2_BUCKET_URL}`)}
-    <slot name="fallback" />
-  {:then}
-    <img {...$$restProps} {src} {alt} />
-  {/await}
-{/if}
-
-{#if import.meta.env.DEV}
-  {#await getFile(src ?? '')}
-    <slot name="fallback" />
-  {:then url}
-    <img {...$$restProps} src={url} {alt} />
-  {/await}
-{/if}
+<Url key={src ?? ''} let:url>
+  <slot slot="fallback" name="fallback" />
+  <img {...$$restProps} src={url} {alt} />
+  <slot slot="catch" name="catch" />
+</Url>

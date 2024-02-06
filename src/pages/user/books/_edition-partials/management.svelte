@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Edition } from '@/pages/api/edition'
+
   import { fly } from 'svelte/transition'
   import { Select } from 'bits-ui'
   import {
@@ -11,13 +13,15 @@
   export let status = ''
   export let protection = ''
   export let binding = ''
+
+  export let errors: Record<keyof Edition, string[]> | null = null
 </script>
 
 <div class="grid gap-y-4 pb-6 px-6 rounded-md bg-white mt-6">
   <h3 class="font-medium py-4 border-b">Management</h3>
 
-  <aside class="grid md:grid-cols-2 gap-3">
-    <Field label="Status">
+  <aside class="grid md:grid-cols-2 gap-4">
+    <Field label="Status" error={errors?.status}>
       <Select.Root
         portal="body"
         selected={statusList
@@ -26,7 +30,8 @@
       >
         <Select.Trigger
           class="flex items-center justify-between border w-full px-3
-          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900"
+          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900
+          {errors?.status ? 'border-red-500' : ''}"
           aria-label="Select a status"
         >
           <Select.Value
@@ -54,7 +59,7 @@
       </Select.Root>
     </Field>
 
-    <Field label="Protection">
+    <Field label="Protection" error={errors?.protection}>
       <Select.Root
         portal="body"
         selected={protectionList
@@ -63,7 +68,8 @@
       >
         <Select.Trigger
           class="flex items-center justify-between border w-full px-3
-          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900"
+          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900
+          {errors?.protection ? 'border-red-500' : ''}"
           aria-label="Select option"
         >
           <Select.Value
@@ -91,7 +97,7 @@
       </Select.Root>
     </Field>
 
-    <Field label="Binding">
+    <Field label="Binding" error={errors?.binding}>
       <Select.Root
         portal="body"
         selected={bindingList
@@ -100,7 +106,8 @@
       >
         <Select.Trigger
           class="flex items-center justify-between border w-full px-3
-          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900"
+          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900
+          {errors?.binding ? 'border-red-500' : ''}"
           aria-label="Select option"
         >
           <Select.Value

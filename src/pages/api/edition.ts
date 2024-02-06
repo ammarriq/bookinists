@@ -7,6 +7,7 @@ import {
   signature_type,
   condition,
   lend_status,
+  thumbnail_type,
 } from '@/lib/constants'
 import { createActions } from '@/lib/utils'
 import { decode } from 'decode-formdata'
@@ -27,6 +28,7 @@ import {
   merge,
   boolean,
   url,
+  array,
 } from 'valibot'
 
 const EditionSchema = object({
@@ -35,8 +37,8 @@ const EditionSchema = object({
   book_id: nullable(string()),
   publisher_id: nullable(string()),
   country_id: nullable(string()),
-  isbn: optional(string()),
-  isbn13: optional(string()),
+  isbn: string([minLength(10, 'Must have 10 digits')]),
+  isbn13: string([minLength(10, 'Must have 13 digits')]),
   status: picklist(status, 'Invalid status selected'),
   protection: picklist(protection, 'Invalid value selected'),
   pages: number(),
@@ -69,7 +71,7 @@ const EditionSchema = object({
   depth: number(),
   purchase_price: number(),
   purchase_date: number(),
-  purchase_invoice: string(),
+  purchase_invoice: string('Invoice is required'),
   seller_id: nullable(string()),
   sell_price: number(),
   sell_date: number(),
@@ -81,13 +83,23 @@ const EditionSchema = object({
 })
 
 const IsbnSchema = merge([
-  pick(EditionSchema, ['date', 'book_id', 'isbn13', 'language_iso', 'pages']),
+  pick(EditionSchema, ['date', 'book_id', 'language_iso', 'pages']),
   object({
     isbn10: string(),
+    isbn13: string(),
     publisher: string(),
     thumbnail: string([url()]),
   }),
 ])
+
+const ThumbnailSchema = object({
+  id: string([minLength(15, 'ID is required')]),
+  image: string('Image is required', [minLength(15, 'Image is required')]),
+  type: picklist(thumbnail_type, 'Invalid value selected'),
+  order: optional(number()),
+  edition_id: optional(string()),
+  created_on: optional(number()),
+})
 
 const decoder = {
   numbers: [
@@ -100,7 +112,6 @@ const decoder = {
     'limited_num',
     'limited_total',
     'signature_page',
-    'description',
     'width',
     'height',
     'depth',
@@ -109,6 +120,7 @@ const decoder = {
     'sell_price',
     'sell_date',
     'lending_time',
+    'thumbnails.$.order',
   ],
   booleans: ['is_limited', 'is_signed', 'need_repair'],
 }
@@ -117,6 +129,12 @@ export type Edition = SwapType<
   Require<Output<typeof EditionSchema>, 'created_on'>,
   boolean,
   number
+>
+
+export type Thumbnail = ToKeyType<
+  Required<Output<typeof ThumbnailSchema>>,
+  'order' | 'edition_id',
+  null
 >
 
 export const POST = createActions({
@@ -129,10 +147,22 @@ export const POST = createActions({
 
     const formData = await request.formData()
     const data = decode(formData, decoder)
-    const result = safeParse(omit(EditionSchema, ['id']), data)
+    const result1 = safeParse(omit(EditionSchema, ['id']), data)
+    const result2 = safeParse(
+      array(omit(ThumbnailSchema, ['id'])),
+      data.thumbnails
+    )
 
-    if (!result.success) {
-      const errors = flatten(result.issues).nested
+    if (!result1.success) {
+      const errors = flatten(result1.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    if (!result2.success) {
+      const errors = flatten(result2.issues).nested
       return Response.json(
         { data: null, success: false, errors },
         { status: 400 }
@@ -142,45 +172,45 @@ export const POST = createActions({
     const edition: Edition = {
       id: generateId(15),
       date: Date.now(),
-      book_id: result.output.book_id || null,
-      publisher_id: result.output.publisher_id || null,
-      country_id: result.output.country_id || null,
-      isbn: result.output.isbn ?? '',
-      isbn13: result.output.isbn13 ?? '',
-      status: result.output.status,
-      protection: result.output.protection,
-      pages: result.output.pages,
-      msrp: result.output.msrp,
-      language_iso: result.output.language_iso,
-      binding: result.output.binding,
-      total_printed: result.output.total_printed,
-      printing: result.output.printing,
-      edition: result.output.edition,
-      is_limited: result.output.is_limited ? 1 : 0,
-      limited_num: result.output.limited_num,
-      limited_total: result.output.limited_total,
-      is_signed: result.output.is_signed ? 1 : 0,
-      signature_type: result.output.signature_type,
-      signature_page: result.output.signature_page,
-      need_repair: result.output.need_repair ? 1 : 0,
-      description: result.output.description,
-      book_condition: result.output.book_condition,
-      book_condition_notes: result.output.book_condition_notes,
-      jacket_condition: result.output.jacket_condition,
-      jacket_condition_notes: result.output.jacket_condition_notes,
-      width: result.output.width,
-      height: result.output.height,
-      depth: result.output.depth,
-      purchase_price: result.output.purchase_price,
-      purchase_date: result.output.purchase_date,
-      purchase_invoice: result.output.purchase_invoice,
-      seller_id: result.output.seller_id || null,
-      sell_price: result.output.sell_price,
-      sell_date: result.output.sell_date,
-      buyer_id: result.output.buyer_id || null,
-      lend_status: result.output.lend_status,
-      lender_id: result.output.lender_id || null,
-      lending_time: result.output.lending_time,
+      book_id: result1.output.book_id || null,
+      publisher_id: result1.output.publisher_id || null,
+      country_id: result1.output.country_id || null,
+      isbn: result1.output.isbn ?? '',
+      isbn13: result1.output.isbn13 ?? '',
+      status: result1.output.status,
+      protection: result1.output.protection,
+      pages: result1.output.pages,
+      msrp: result1.output.msrp,
+      language_iso: result1.output.language_iso,
+      binding: result1.output.binding,
+      total_printed: result1.output.total_printed,
+      printing: result1.output.printing,
+      edition: result1.output.edition,
+      is_limited: result1.output.is_limited ? 1 : 0,
+      limited_num: result1.output.limited_num,
+      limited_total: result1.output.limited_total,
+      is_signed: result1.output.is_signed ? 1 : 0,
+      signature_type: result1.output.signature_type,
+      signature_page: result1.output.signature_page,
+      need_repair: result1.output.need_repair ? 1 : 0,
+      description: result1.output.description,
+      book_condition: result1.output.book_condition,
+      book_condition_notes: result1.output.book_condition_notes,
+      jacket_condition: result1.output.jacket_condition,
+      jacket_condition_notes: result1.output.jacket_condition_notes,
+      width: result1.output.width,
+      height: result1.output.height,
+      depth: result1.output.depth,
+      purchase_price: result1.output.purchase_price,
+      purchase_date: result1.output.purchase_date,
+      purchase_invoice: result1.output.purchase_invoice,
+      seller_id: result1.output.seller_id || null,
+      sell_price: result1.output.sell_price,
+      sell_date: result1.output.sell_date,
+      buyer_id: result1.output.buyer_id || null,
+      lend_status: result1.output.lend_status,
+      lender_id: result1.output.lender_id || null,
+      lending_time: result1.output.lending_time,
       created_on: Date.now(),
     }
 
@@ -192,12 +222,29 @@ export const POST = createActions({
           is_signed, signature_type, signature_page, need_repair, description, book_condition,
           book_condition_notes, jacket_condition, jacket_condition_notes, width, height, depth,
           purchase_price, purchase_date, purchase_invoice, seller_id, sell_price, sell_date, buyer_id,
-          lend_status, lender_id, lending_time, created_on,) 
+          lend_status, lender_id, lending_time, created_on) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,)`
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(...Object.values(edition))
       .run()
+
+    const thumbnails: Thumbnail[] = result2.output.map((o) => ({
+      id: generateId(15),
+      image: o.image,
+      type: o.type,
+      edition_id: edition.id,
+      order: o.order ?? null,
+      created_on: Date.now(),
+    }))
+
+    const stmt = `INSERT INTO editions_images
+      (id, image, type, edition_id, "order", created_on)
+      VALUES(?, ?, ?, ?, ?, ?)`
+
+    await db.batch([
+      ...thumbnails.map((o) => db.prepare(stmt).bind(...Object.values(o))),
+    ])
 
     return Response.json(
       { data: edition, success: true, errors: null },

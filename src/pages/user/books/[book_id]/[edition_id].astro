@@ -18,7 +18,7 @@ const db = Astro.locals.runtime.env.SITE_DB
 const user = Astro.locals.user
 if (!user) return Astro.redirect('/login')
 
-const edition_id = Astro.params.edition
+const edition_id = Astro.params.edition_id
 
 const getEdition = db
   .prepare(
@@ -119,14 +119,9 @@ if (!edition) {
     </section>
 
     <aside>
-      <Thumbnails
-        edition_id={edition.id}
-        thumbnails={thumbnails.results}
-        client:load
-      />
+      <Thumbnails client:load />
 
       <Purchase
-        edition_id={edition.id}
         purchase_date={edition.purchase_date}
         purchase_price={edition.purchase_price}
         purchase_invoice={edition.purchase_invoice}

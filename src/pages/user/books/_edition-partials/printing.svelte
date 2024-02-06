@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Edition } from '@/pages/api/edition'
+
   import { Switch } from 'bits-ui'
   import Field from '@/components/field.svelte'
 
@@ -8,13 +10,18 @@
   export let edition = 0
   export let total_printed = 0
   export let printing = 0
+
+  export let errors: Record<keyof Edition, string[]> | null = null
 </script>
 
 <div class="grid gap-y-4 pb-6 px-6 rounded-md bg-white mt-6">
   <h3 class="font-medium py-4 border-b">Printing</h3>
 
-  <aside class="grid md:grid-cols-2 gap-3">
-    <Field class="col-span-2 px-3 py-2 border rounded-md">
+  <aside class="grid md:grid-cols-2 gap-4">
+    <Field
+      class="col-span-2 px-3 py-2 border rounded-md"
+      error={errors?.is_limited}
+    >
       <div class="flex items-center justify-between">
         <hgroup>
           <h2 class="text-sm font-medium">Limited</h2>
@@ -35,53 +42,58 @@
       </div>
     </Field>
 
-    <Field label="Limited number">
+    <Field label="Limited number" error={errors?.limited_num}>
       <input
         type="number"
         name="limited_num"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900"
         value={limited_num}
+        class:border-red-500={errors?.limited_num}
       />
     </Field>
 
-    <Field label="Limited total">
+    <Field label="Limited total" error={errors?.limited_total}>
       <input
         type="number"
         name="limited_total"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900"
         value={limited_total}
+        class:border-red-500={errors?.limited_total}
       />
     </Field>
 
-    <Field label="Edition">
+    <Field label="Edition" error={errors?.edition}>
       <input
         type="number"
         name="edition"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900"
         value={edition}
+        class:border-red-500={errors?.edition}
       />
     </Field>
 
-    <Field label="Total printed">
+    <Field label="Total printed" error={errors?.total_printed}>
       <input
         type="number"
         name="total_printed"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900"
         value={total_printed}
+        class:border-red-500={errors?.total_printed}
       />
     </Field>
 
-    <Field label="Printing">
+    <Field label="Printing" error={errors?.printing}>
       <input
         type="number"
         name="printing"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900"
         value={printing}
+        class:border-red-500={errors?.printing}
       />
     </Field>
   </aside>

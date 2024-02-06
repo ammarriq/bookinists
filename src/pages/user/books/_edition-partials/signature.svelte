@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Edition } from '@/pages/api/edition'
+
   import { fly } from 'svelte/transition'
   import { Select, Switch } from 'bits-ui'
   import { signature_type as signatureList } from '@/lib/constants'
@@ -7,13 +9,18 @@
   export let is_signed = false
   export let signature_type = ''
   export let signature_page = 0
+
+  export let errors: Record<keyof Edition, string[]> | null = null
 </script>
 
 <div class="grid gap-y-4 pb-6 px-6 rounded-md bg-white mt-6">
   <h3 class="font-medium py-4 border-b">Signature</h3>
 
-  <aside class="grid md:grid-cols-2 gap-3">
-    <Field class="col-span-2 px-3 py-2 border rounded-md">
+  <aside class="grid md:grid-cols-2 gap-4">
+    <Field
+      class="col-span-2 px-3 py-2 border rounded-md"
+      error={errors?.is_signed}
+    >
       <div class="flex items-center justify-between">
         <hgroup>
           <h2 class="text-sm font-medium">Signature</h2>
@@ -25,7 +32,7 @@
           class="flex items-center w-[40px] h-[21px]
           rounded-full bg-slate-200 data-[checked]:bg-slate-900"
         >
-          <Switch.Input class="peer" name="is_signature" />
+          <Switch.Input class="peer" name="is_signed" />
           <i
             class="bg-white rounded-full duration-300 size-[17px]
             translate-x-[2px] peer-checked:translate-x-[20px]"
@@ -34,7 +41,7 @@
       </div>
     </Field>
 
-    <Field label="Signature type">
+    <Field label="Signature type" error={errors?.signature_type}>
       <Select.Root
         portal="body"
         selected={signatureList
@@ -43,7 +50,8 @@
       >
         <Select.Trigger
           class="flex items-center justify-between border w-full px-3
-          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900"
+          py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900
+          {errors?.signature_type ? 'border-red-500' : ''}"
           aria-label="Select a signature"
         >
           <Select.Value
@@ -73,13 +81,14 @@
       </Select.Root>
     </Field>
 
-    <Field label="Signature page">
+    <Field label="Signature page" error={errors?.signature_page}>
       <input
         type="number"
         name="signature_page"
         class="border w-full px-3 py-1.5 rounded-md text-sm
         shadow-sm focus:outline-slate-900"
         value={signature_page}
+        class:border-red-500={errors?.signature_page}
       />
     </Field>
   </aside>

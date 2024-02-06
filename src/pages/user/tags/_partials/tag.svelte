@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Tag } from '@/pages/api/tag'
 
-  import Image from '@/components/image.svelte'
+  import Image from '@/components/url.svelte'
   import TagActions from './tag-actions.svelte'
 
   export let tag: Tag

@@ -50,7 +50,9 @@
     uploadFile(formData)
   }
 
-  const deleteFile = async (e: Event) => {
+  const deleteFile = async () => {
+    console.log('deleted')
+
     const res = await fetch('/api/file', {
       method: 'DELETE',
       body: createFormData({ key }),
@@ -65,8 +67,6 @@
 
     status = 'idle'
   }
-
-  $: console.log(key)
 </script>
 
 {#if status === 'idle'}
@@ -94,11 +94,11 @@
 
     <div class="text-center">
       <p class="text-primary text-sm font-semibold">
-        <span>Drag and drop to upload</span>
-        <span>or browse files</span>
+        <span>Drag and drop or</span>
+        <span class="text-amber-300 font-semibold">Browse</span>
       </p>
 
-      <p class="text-sm text-gray-400">Only images accepted</p>
+      <p class="text-xs text-gray-400 mt-1">Only images accepted</p>
     </div>
 
     <input
@@ -111,7 +111,7 @@
 {/if}
 
 {#if status !== 'idle'}
-  <div class="relative border mt-4 rounded-md mx-auto pl-10 p-3 text-sm">
+  <div class="relative border rounded-md w-full mx-auto pl-10 p-3 text-sm">
     {#if status === 'pending'}
       <i
         class="icon-[tabler--loader-2] animate-spin
@@ -127,9 +127,11 @@
     {#if status === 'resolved'}
       <button
         type="button"
+        class="size-3.5 absolute top-4 right-3.5"
         on:click={deleteFile}
-        class="icon-[tabler--x] size-3.5 absolute top-4 right-3.5"
-      />
+      >
+        <i class="icon-[tabler--x]" />
+      </button>
     {/if}
 
     <div class="space-y-0.5 mr-10">
