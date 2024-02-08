@@ -1,17 +1,11 @@
 <script lang="ts">
-  import thumbnail from './thumbnail.svelte'
-
   import { createFormData } from '@/lib/utils'
   import { toast } from 'svelte-sonner'
-  import TypeSelection from './type-selection.svelte'
-  import Thumbnail from './thumbnail.svelte'
 
-  export let error: string[] | null = null
   export let keys: string[] = []
   export let statuses: ('idle' | 'pending' | 'resolved')[] = []
-
-  let files: File[] = []
-  let progresses: number[] = []
+  export let files: (File | null)[] = []
+  export let progresses: number[] = []
 
   const uploadFile = (formData: FormData, index: number) => {
     statuses[index] = 'pending'
@@ -56,25 +50,6 @@
     const formData = createFormData({ file })
     uploadFile(formData, statuses.length - 1)
   }
-
-  const deleteFile = async (key: string, index: number) => {
-    const res = await fetch('/api/file', {
-      method: 'DELETE',
-      body: createFormData({ key }),
-    })
-
-    const json = (await res.json()) as FetchResponse<{ key: string }>
-
-    if (!json.success) {
-      const error = json.errors.message.at(-1)
-      return toast.error(error ?? 'Something went wrong. Try again later.')
-    }
-
-    keys = keys.filter((_, i) => i !== index)
-    files = files.filter((_, i) => i !== index)
-    progresses = progresses.filter((_, i) => i !== index)
-    statuses = statuses.filter((_, i) => i !== index)
-  }
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -88,14 +63,7 @@
   class="relative flex gap-2 flex-col items-center
   justify-center border cursor-pointer p-2 rounded-md
   focus-within:outline"
-  class:border-red-500={!!error?.length}
 >
-  {#if error}
-    <small class="text-sm absolute top-full left-0 text-red-500">
-      {error}
-    </small>
-  {/if}
-
   <div class="size-12 grid place-items-center rounded-full bg-slate-100">
     <i class="icon-[tabler--cloud-upload] size-6 text-primary" />
   </div>
@@ -116,20 +84,3 @@
     accept="image/*"
   />
 </label>
-
-<ul class="space-y-2">
-  {#each files as file, index (file.name)}
-    {@const key = keys[index]}
-    {@const status = statuses[index]}
-    {@const progress = progresses[index]}
-
-    <Thumbnail
-      {index}
-      {key}
-      {file}
-      {status}
-      {progress}
-      on:delete={(e) => deleteFile(e.detail.key, e.detail.index)}
-    />
-  {/each}
-</ul>

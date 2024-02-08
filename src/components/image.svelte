@@ -5,26 +5,6 @@
   type $$Props = HTMLImgAttributes
   export let src: $$Props['src'] = ''
   export let alt: $$Props['alt'] = ''
-
-  const getFile = async (key: string) => {
-    const res = await fetch(`/api/file?key=${key}`)
-
-    const blob = new Blob([await res.arrayBuffer()])
-    const url = URL.createObjectURL(blob)
-
-    await loadImg(url)
-
-    return url
-  }
-
-  const loadImg = async (src: string) => {
-    return new Promise((r) => {
-      const image = new Image()
-      image.src = src
-
-      image.onload = r
-    })
-  }
 </script>
 
 <Url key={src ?? ''} let:url>

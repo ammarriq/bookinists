@@ -93,9 +93,10 @@ const IsbnSchema = merge([
 ])
 
 const ThumbnailSchema = object({
-  id: string([minLength(15, 'ID is required')]),
+  id: optional(string()),
   image: string('Image is required', [minLength(15, 'Image is required')]),
   type: picklist(thumbnail_type, 'Invalid value selected'),
+  is_new: boolean(),
   order: optional(number()),
   edition_id: optional(string()),
   created_on: optional(number()),
@@ -122,7 +123,7 @@ const decoder = {
     'lending_time',
     'thumbnails.$.order',
   ],
-  booleans: ['is_limited', 'is_signed', 'need_repair'],
+  booleans: ['is_limited', 'is_signed', 'need_repair', 'thumbnails.$.is_new'],
 }
 
 export type Edition = SwapType<
@@ -145,24 +146,17 @@ export const POST = createActions({
       return new Response(null, { status: 401 })
     }
 
+    const Schema = merge([
+      omit(EditionSchema, ['id']),
+      object({ thumbnails: array(omit(ThumbnailSchema, ['id'])) }),
+    ])
+
     const formData = await request.formData()
     const data = decode(formData, decoder)
-    const result1 = safeParse(omit(EditionSchema, ['id']), data)
-    const result2 = safeParse(
-      array(omit(ThumbnailSchema, ['id'])),
-      data.thumbnails
-    )
+    const result = safeParse(Schema, data)
 
-    if (!result1.success) {
-      const errors = flatten(result1.issues).nested
-      return Response.json(
-        { data: null, success: false, errors },
-        { status: 400 }
-      )
-    }
-
-    if (!result2.success) {
-      const errors = flatten(result2.issues).nested
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
       return Response.json(
         { data: null, success: false, errors },
         { status: 400 }
@@ -172,45 +166,45 @@ export const POST = createActions({
     const edition: Edition = {
       id: generateId(15),
       date: Date.now(),
-      book_id: result1.output.book_id || null,
-      publisher_id: result1.output.publisher_id || null,
-      country_id: result1.output.country_id || null,
-      isbn: result1.output.isbn ?? '',
-      isbn13: result1.output.isbn13 ?? '',
-      status: result1.output.status,
-      protection: result1.output.protection,
-      pages: result1.output.pages,
-      msrp: result1.output.msrp,
-      language_iso: result1.output.language_iso,
-      binding: result1.output.binding,
-      total_printed: result1.output.total_printed,
-      printing: result1.output.printing,
-      edition: result1.output.edition,
-      is_limited: result1.output.is_limited ? 1 : 0,
-      limited_num: result1.output.limited_num,
-      limited_total: result1.output.limited_total,
-      is_signed: result1.output.is_signed ? 1 : 0,
-      signature_type: result1.output.signature_type,
-      signature_page: result1.output.signature_page,
-      need_repair: result1.output.need_repair ? 1 : 0,
-      description: result1.output.description,
-      book_condition: result1.output.book_condition,
-      book_condition_notes: result1.output.book_condition_notes,
-      jacket_condition: result1.output.jacket_condition,
-      jacket_condition_notes: result1.output.jacket_condition_notes,
-      width: result1.output.width,
-      height: result1.output.height,
-      depth: result1.output.depth,
-      purchase_price: result1.output.purchase_price,
-      purchase_date: result1.output.purchase_date,
-      purchase_invoice: result1.output.purchase_invoice,
-      seller_id: result1.output.seller_id || null,
-      sell_price: result1.output.sell_price,
-      sell_date: result1.output.sell_date,
-      buyer_id: result1.output.buyer_id || null,
-      lend_status: result1.output.lend_status,
-      lender_id: result1.output.lender_id || null,
-      lending_time: result1.output.lending_time,
+      book_id: result.output.book_id || null,
+      publisher_id: result.output.publisher_id || null,
+      country_id: result.output.country_id || null,
+      isbn: result.output.isbn ?? '',
+      isbn13: result.output.isbn13 ?? '',
+      status: result.output.status,
+      protection: result.output.protection,
+      pages: result.output.pages,
+      msrp: result.output.msrp,
+      language_iso: result.output.language_iso,
+      binding: result.output.binding,
+      total_printed: result.output.total_printed,
+      printing: result.output.printing,
+      edition: result.output.edition,
+      is_limited: result.output.is_limited ? 1 : 0,
+      limited_num: result.output.limited_num,
+      limited_total: result.output.limited_total,
+      is_signed: result.output.is_signed ? 1 : 0,
+      signature_type: result.output.signature_type,
+      signature_page: result.output.signature_page,
+      need_repair: result.output.need_repair ? 1 : 0,
+      description: result.output.description,
+      book_condition: result.output.book_condition,
+      book_condition_notes: result.output.book_condition_notes,
+      jacket_condition: result.output.jacket_condition,
+      jacket_condition_notes: result.output.jacket_condition_notes,
+      width: result.output.width,
+      height: result.output.height,
+      depth: result.output.depth,
+      purchase_price: result.output.purchase_price,
+      purchase_date: result.output.purchase_date,
+      purchase_invoice: result.output.purchase_invoice,
+      seller_id: result.output.seller_id || null,
+      sell_price: result.output.sell_price,
+      sell_date: result.output.sell_date,
+      buyer_id: result.output.buyer_id || null,
+      lend_status: result.output.lend_status,
+      lender_id: result.output.lender_id || null,
+      lending_time: result.output.lending_time,
       created_on: Date.now(),
     }
 
@@ -229,14 +223,15 @@ export const POST = createActions({
       .bind(...Object.values(edition))
       .run()
 
-    const thumbnails: Thumbnail[] = result2.output.map((o) => ({
-      id: generateId(15),
-      image: o.image,
-      type: o.type,
-      edition_id: edition.id,
-      order: o.order ?? null,
-      created_on: Date.now(),
-    }))
+    const thumbnails: Omit<Thumbnail, 'is_new'>[] =
+      result.output.thumbnails.map((o) => ({
+        id: generateId(15),
+        image: o.image,
+        type: o.type,
+        edition_id: edition.id,
+        order: o.order ?? null,
+        created_on: Date.now(),
+      }))
 
     const stmt = `INSERT INTO editions_images
       (id, image, type, edition_id, "order", created_on)
@@ -338,9 +333,14 @@ export const POST = createActions({
       return new Response(null, { status: 401 })
     }
 
+    const Schema = merge([
+      EditionSchema,
+      object({ thumbnails: array(ThumbnailSchema) }),
+    ])
+
     const formData = await request.formData()
     const data = decode(formData, decoder)
-    const result = safeParse(EditionSchema, data)
+    const result = safeParse(Schema, data)
 
     if (!result.success) {
       const errors = flatten(result.issues).nested
@@ -349,7 +349,6 @@ export const POST = createActions({
         { status: 400 }
       )
     }
-
     const edition: Omit<Edition, 'id' | 'created_on'> = {
       date: Date.now(),
       book_id: result.output.book_id || null,
@@ -396,20 +395,87 @@ export const POST = createActions({
     await db
       .prepare(
         `UPDATE editions
-        SET id=?, date=?, book_id=?, publisher_id=?, country_id=?, isbn=?, isbn13=?, status=?, protection=?,
+        SET date=?, book_id=?, publisher_id=?, country_id=?, isbn=?, isbn13=?, status=?, protection=?,
         pages=?, msrp=?, language_iso=?, binding=?, total_printed=?, printing=?, edition=?, is_limited=?,
         limited_num=?, limited_total=?, is_signed=?, signature_type=?, signature_page=?, need_repair=?,
         description=?, book_condition=?, book_condition_notes=?, jacket_condition=?, jacket_condition_notes=?,
         width=?, height=?, depth=?, purchase_price=?, purchase_date=?, purchase_invoice=?, seller_id=?,
-        sell_price=?, sell_date=?, buyer_id=?, lend_status=?, lender_id=?, lending_time=?, created_on=?
+        sell_price=?, sell_date=?, buyer_id=?, lend_status=?, lender_id=?, lending_time=?
         WHERE id=?`
       )
       .bind(...Object.values(edition), result.output.id)
       .run()
 
+    const thumbnails: Partial<Thumbnail>[] = result.output.thumbnails.map(
+      (o) => ({
+        id: o.is_new ? generateId(15) : o.id,
+        image: o.image,
+        type: o.type,
+        edition_id: result.output.id,
+        is_new: o.is_new,
+        order: o.order ?? null,
+        created_on: Date.now(),
+      })
+    )
+
+    const insert_stmt = `INSERT INTO editions_images
+      (id, image, type, edition_id, "order", created_on)
+      VALUES(?, ?, ?, ?, ?, ?)`
+
+    const update_stmt = `UPDATE editions_images
+      SET image=?, type=?, edition_id=?, "order"=?
+      WHERE id = ?`
+
+    if (thumbnails.length) {
+      await db.batch([
+        ...thumbnails.map((o) => {
+          const { id, is_new, created_on, ...thumbnail } = o
+
+          if (o.is_new) {
+            return db
+              .prepare(insert_stmt)
+              .bind(id, ...Object.values(thumbnail), created_on)
+          }
+
+          return db.prepare(update_stmt).bind(...Object.values(thumbnail), id)
+        }),
+      ])
+    }
+
     return Response.json(
       { data: result.output, success: true, errors: null },
       { status: 201 }
+    )
+  },
+  delete_thumbnail: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
+    const bucket = locals.runtime.env.SITE_BUCKET
+
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
+
+    const formData = await request.formData()
+    const data = decode(formData)
+    const result = safeParse(pick(ThumbnailSchema, ['id', 'image']), data)
+
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    await db
+      .prepare(`DELETE FROM editions_images WHERE id=?`)
+      .bind(result.output.id) //
+      .run()
+    await bucket.delete(result.output.image)
+
+    return Response.json(
+      { data: result.output, success: true, errors: null },
+      { status: 202 }
     )
   },
   delete: async ({ locals, request }) => {

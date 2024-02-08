@@ -77,7 +77,7 @@
   </section>
 
   <aside>
-    <Thumbnails />
+    <Thumbnails {errors} />
     <Purchase {errors} />
   </aside>
 </form>
