@@ -1,7 +1,8 @@
-import { defineConfig } from 'astro/config'
-import svelte from '@astrojs/svelte'
-import tailwind from '@astrojs/tailwind'
-import cloudflare from '@astrojs/cloudflare'
+import { defineConfig } from 'astro/config';
+import svelte from '@astrojs/svelte';
+import tailwind from '@astrojs/tailwind';
+import cloudflare from '@astrojs/cloudflare';
+
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,12 +14,12 @@ export default defineConfig({
       type: 'pages',
       bindings: {
         SITE_DB: {
-          type: 'd1',
+          type: 'd1'
         },
         SITE_BUCKET: {
-          type: 'r2',
-        },
-      },
-    },
-  }),
-})
+          type: 'r2'
+        }
+      }
+    }
+  })
+});
