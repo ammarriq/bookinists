@@ -164,7 +164,7 @@
           <Field label="Country" error={errors?.country_id}>
             <CountrySelect
               error={errors?.country_id}
-              country_id={award.country_id}
+              country_id={award.country_id ?? ''}
             />
           </Field>
 
