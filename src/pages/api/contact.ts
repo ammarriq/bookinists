@@ -45,7 +45,7 @@ const decoder = {
   booleans: ['use_whatsapp', 'use_signal', 'is_professional'],
 }
 
-export type Contact = ToType<
+export type Contact = SwapType<
   Required<Output<typeof ContactSchema>>,
   boolean,
   number

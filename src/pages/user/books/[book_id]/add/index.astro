@@ -1,0 +1,26 @@
+---
+import type { Book } from '@/pages/api/book'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import Form from './_form.svelte'
+
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const book_id = Astro.params.book_id
+
+const book = await db
+  .prepare(`SELECT id, title FROM books WHERE id=?`)
+  .bind(book_id)
+  .first<Pick<Book, 'id' | 'title'>>()
+
+if (!book) {
+  return Astro.redirect('/404', 404)
+}
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <Form book_id={book.id} book_title={book.title} client:load />
+</AdminLayout>

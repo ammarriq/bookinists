@@ -1,17 +1,18 @@
 ---
-import type { Book } from '@/pages/api/book'
+import type { Edition } from '@/pages/api/edition'
+import type { Thumbnail } from '@/pages/api/thumbnail'
 
 import AdminLayout from '@/layouts/AdminLayout.astro'
+import Form from './_form.svelte'
 
-const PER_PAGE = 10
 const db = Astro.locals.runtime.env.SITE_DB
 
 const user = Astro.locals.user
 if (!user) return Astro.redirect('/login')
 
-const edition_id = Astro.params.edition
+const edition_id = Astro.params.edition_id
 
-const edition = await db
+const getEdition = db
   .prepare(
     `SELECT e.*,
             b.title AS book_title,
@@ -25,22 +26,26 @@ const edition = await db
     LEFT JOIN contacts s ON s.id = e.seller_id
     LEFT JOIN contacts b2 ON b2.id = e.buyer_id
     LEFT JOIN contacts l ON l.id = e.lender_id
-    LEFT JOIN editions_images i ON i.edition_id = e.id
     WHERE e.id=?`,
   )
-
   .bind(edition_id)
-  .run<Book & { author_name: string }>()
+  .first<Edition & { book_title: string }>()
 
-if (!edition.results.length) {
+const getThumbnails = db
+  .prepare(
+    `SELECT * FROM editions_images
+    WHERE edition_id=?`,
+  )
+  .bind(edition_id)
+  .run<Thumbnail>()
+
+const [edition, thumbnails] = await Promise.all([getEdition, getThumbnails])
+
+if (!edition) {
   return Astro.redirect('/404', 404)
 }
 ---
 
 <AdminLayout title="Admin | Bookinists">
-  <main class="px-4 py-6">
-    <pre>
-      {JSON.stringify(edition, null, 2)}
-    </pre>
-  </main>
+  <Form edition={edition} thumbnails={thumbnails.results} client:load />
 </AdminLayout>
