@@ -1,10 +1,15 @@
 <script lang="ts">
   import type { Book } from '@/pages/api/book'
 
+  import { createEventDispatcher } from 'svelte'
+  import { Switch } from 'bits-ui'
   import { stars } from '@/lib/utils'
   import BookActions from './book-actions.svelte'
 
   export let book: Book
+  export let selected = false
+
+  const dispatch = createEventDispatcher<{ change: boolean }>()
 
   const status = {
     unread: 'bg-red-500/20 text-red-500',
@@ -14,6 +19,20 @@
 </script>
 
 <tr class="text-sm border-b">
+  <td class="py-2.5 px-4">
+    <Switch.Root
+      checked={selected}
+      onCheckedChange={(isChecked) => dispatch('change', isChecked)}
+      class="flex items-center justify-center
+      border rounded-md shadow size-4 bg-white"
+    >
+      <Switch.Input class="peer" name="use_whatsapp" />
+      <i
+        class="icon-[tabler--square-rounded-check-filled] bg-black
+        shrink-0 size-[1.125rem] hidden peer-checked:block"
+      />
+    </Switch.Root>
+  </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
     <a
       href="/user/books/{book.id}"
