@@ -19,7 +19,7 @@ const getCount = db
 const getMarketplaces = db
   .prepare('SELECT * FROM marketplaces LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Marketplace>()
+  .all<Marketplace>()
 
 const [count, marketplaces] = await Promise.all([getCount, getMarketplaces])
 ---

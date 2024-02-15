@@ -19,7 +19,7 @@ const getCount = db
 const getGenres = db
   .prepare('SELECT * FROM genres LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Genre>()
+  .all<Genre>()
 
 const [count, genres] = await Promise.all([getCount, getGenres])
 ---

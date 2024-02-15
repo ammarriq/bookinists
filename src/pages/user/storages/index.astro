@@ -19,7 +19,7 @@ const getCount = db
 const getStorages = db
   .prepare('SELECT * FROM storages LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Storage>()
+  .all<Storage>()
 
 const [count, storages] = await Promise.all([getCount, getStorages])
 ---

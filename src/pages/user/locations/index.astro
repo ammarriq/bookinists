@@ -19,7 +19,7 @@ const getCount = db
 const getLocations = db
   .prepare('SELECT * FROM locations LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Location>()
+  .all<Location>()
 
 const [count, locations] = await Promise.all([getCount, getLocations])
 ---

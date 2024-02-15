@@ -28,12 +28,12 @@ const getBook = db
     WHERE books.id=?`,
   )
   .bind(book_id)
-  .run<Book & { author_name: string }>()
+  .all<Book & { author_name: string }>()
 
 const getEditions = db
   .prepare('SELECT * FROM editions WHERE book_id=? LIMIT ? OFFSET ?')
   .bind(book_id, PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Edition>()
+  .all<Edition>()
 
 const [count, book, editions] = await Promise.all([
   getCount,

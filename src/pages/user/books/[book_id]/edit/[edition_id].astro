@@ -37,7 +37,7 @@ const getThumbnails = db
     WHERE edition_id=?`,
   )
   .bind(edition_id)
-  .run<Thumbnail>()
+  .all<Thumbnail>()
 
 const [edition, thumbnails] = await Promise.all([getEdition, getThumbnails])
 

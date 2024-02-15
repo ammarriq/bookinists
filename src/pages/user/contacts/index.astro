@@ -19,7 +19,7 @@ const getCount = db
 const getContacts = db
   .prepare('SELECT * FROM contacts LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Contact>()
+  .all<Contact>()
 
 const [count, contacts] = await Promise.all([getCount, getContacts])
 ---

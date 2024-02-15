@@ -19,7 +19,7 @@ const getCount = db
 const getAuthors = db
   .prepare('SELECT * FROM authors LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Author>()
+  .all<Author>()
 
 const [count, authors] = await Promise.all([getCount, getAuthors])
 ---

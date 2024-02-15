@@ -19,7 +19,7 @@ const getCount = db
 const getAwards = db
   .prepare('SELECT * FROM awards LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Award>()
+  .all<Award>()
 
 const [count, awards] = await Promise.all([getCount, getAwards])
 ---

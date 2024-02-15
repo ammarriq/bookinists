@@ -19,7 +19,7 @@ const getCount = db
 const getCollections = db
   .prepare('SELECT * FROM collections LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Collection>()
+  .all<Collection>()
 
 const [count, collections] = await Promise.all([getCount, getCollections])
 ---

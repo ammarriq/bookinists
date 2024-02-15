@@ -19,7 +19,7 @@ const getCount = db
 const getRooms = db
   .prepare('SELECT * FROM rooms LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Room>()
+  .all<Room>()
 
 const [count, rooms] = await Promise.all([getCount, getRooms])
 ---

@@ -19,7 +19,7 @@ const getCount = db
 const getCountries = db
   .prepare('SELECT * FROM countries LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Country>()
+  .all<Country>()
 
 const [count, countries] = await Promise.all([getCount, getCountries])
 ---

@@ -32,7 +32,7 @@ export const GET = (async ({ locals }) => {
     return new Response(null, { status: 401 })
   }
 
-  const { results } = await db.prepare('SELECT * FROM countries').run<Country>()
+  const { results } = await db.prepare('SELECT * FROM countries').all<Country>()
 
   return Response.json(
     { data: results, success: true, errors: null },

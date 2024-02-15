@@ -19,7 +19,7 @@ const getCount = db
 const getTags = db
   .prepare('SELECT * FROM tags LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .run<Tag>()
+  .all<Tag>()
 
 const [count, tags] = await Promise.all([getCount, getTags])
 ---
