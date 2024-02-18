@@ -3,20 +3,19 @@
   import type { Book } from '@/pages/api/book'
 
   import { fade, fly } from 'svelte/transition'
-  import { createEventDispatcher } from 'svelte'
-  import { Dialog, Select } from 'bits-ui'
+  import { Dialog, Combobox } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
-  import { read_status } from '@/lib/constants'
+  import { debounce } from '@/lib/utils'
   import Field from '@/components/field.svelte'
   import Button from '@/components/button.svelte'
+
+  export let books: string[]
 
   let submitting = false
   let dialogOpen = false
 
-  let deleteForm: HTMLFormElement
+  let lists: Record<'value' | 'label', string>[] = []
   let errors: Record<keyof Book, string[]> | null = null
-
-  const dispatch = createEventDispatcher<{ edit: Book; delete: string }>()
 
   const editBook: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
@@ -33,27 +32,25 @@
     const json = (await res.json()) as FetchResponse<Book>
     if (!json.success) return (errors = json.errors)
 
+    books = []
     dialogOpen = false
-    dispatch('edit', json.data)
   }
 
-  const deleteBook = async () => {
-    if (!confirm('Are you sure you wanna delete selected books?')) return
-    submitting = true
-
-    const form = deleteForm
-    const formData = new FormData(form)
-
-    const res = await fetch(form.action, {
-      method: form.method,
-      body: formData,
-    })
-
+  const debouncedFetch = debounce(async (value: string) => {
+    const res = await fetch(`/api/list?query=${value}`)
+    const json = (await res.json()) as FetchResponse<typeof lists>
     submitting = false
-    const json = (await res.json()) as FetchResponse<Book>
-    if (!json.success) return (errors = json.errors)
 
-    dispatch('delete', json.data.id)
+    lists = json.data ?? []
+  }, 500)
+
+  const onInput = (e: unknown) => {
+    const event = (e as CustomEvent<Event>).detail
+    const target = event.currentTarget as HTMLInputElement
+    if (!target.value) return
+
+    submitting = true
+    debouncedFetch(target.value)
   }
 </script>
 
@@ -88,42 +85,51 @@
         </Dialog.Title>
 
         <form
-          action="/api/book?edit"
+          action="/api/book?move_to_list"
           method="post"
           class="space-y-4"
           on:submit|preventDefault={editBook}
         >
-          <Field label="Read status" error={errors?.read_status}>
-            <Select.Root portal=".dialog">
-              <Select.Trigger
-                class="flex items-center justify-between border w-full px-3
-                py-1.5 rounded-md text-sm  shadow-sm focus:outline-slate-900
-                {!!errors?.read_status ? 'border-red-500' : ''}"
-                aria-label="Select a status"
-              >
-                <Select.Value
-                  class="text-sm first-letter:capitalize"
-                  placeholder="Select a status"
-                />
-                <Select.Input name="read_status" />
-                <i class="icon-[tabler--selector]" />
-              </Select.Trigger>
-              <Select.Content
-                class="w-full rounded-md p-1 border bg-white  shadow-sm z-40"
+          {#each books as book (book)}
+            <input type="hidden" name="book_ids" value={book} />
+          {/each}
+
+          <Field label="Select list" error={errors?.read_status}>
+            <Combobox.Root portal=".dialog">
+              <Combobox.HiddenInput name="list_id" />
+              <Combobox.Input
+                on:input={onInput}
+                type="text"
+                class="border w-full px-3 py-1.5 rounded-md text-sm
+                shadow-sm focus:outline-slate-900"
+              />
+
+              <Combobox.Content
+                class="w-full rounded-md p-1 border bg-white shadow-sm z-40"
                 transition={(e) => fly(e, { duration: 150, y: -5 })}
                 sideOffset={8}
               >
-                {#each read_status as role}
-                  <Select.Item
+                {#each lists as { value, label } (value)}
+                  <Combobox.Item
                     class="px-2 py-1 text-sm capitalize rounded-md cursor-default hover:bg-slate-100"
-                    value={role}
-                    label={role}
+                    {value}
+                    {label}
                   >
-                    {role}
-                  </Select.Item>
+                    {label}
+                  </Combobox.Item>
+                {:else}
+                  <p class="flex justify-center p-1">
+                    {#if submitting}
+                      <i class="icon-[tabler--loader-2] animate-spin" />
+                    {:else}
+                      <span class="text-sm italic text-gray-600">
+                        Please type to search something
+                      </span>
+                    {/if}
+                  </p>
                 {/each}
-              </Select.Content>
-            </Select.Root>
+              </Combobox.Content>
+            </Combobox.Root>
           </Field>
 
           <button

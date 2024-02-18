@@ -297,6 +297,17 @@ CREATE TABLE IF NOT EXISTS lists (
    created_on INTEGER
 );
 
+-- DROP TABLE IF EXISTS books_lists;
+CREATE TABLE IF NOT EXISTS books_lists (
+   id TEXT PRIMARY KEY,
+   book_id TEXT,
+   list_id TEXT,
+   "order" INTEGER,
+   created_on INTEGER,
+   FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+   FOREIGN KEY (list_id) REFERENCES lists(id) ON DELETE CASCADE
+);
+
 -- DROP TABLE IF EXISTS lists_fts;
 CREATE VIRTUAL TABLE IF NOT EXISTS lists_fts USING fts5(id, name);
 

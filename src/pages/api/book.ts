@@ -20,6 +20,7 @@ import {
   pick,
   merge,
   array,
+  length,
 } from 'valibot'
 
 const BookSchema = object({
@@ -311,6 +312,48 @@ export const POST = createActions({
 
     return Response.json(
       { data: result.output, success: true, errors: null },
+      { status: 202 }
+    )
+  },
+  move_to_list: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
+
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
+
+    const schema = object({
+      list_id: string([length(15)]),
+      book_ids: array(string([length(15)])),
+    })
+
+    const formData = await request.formData()
+    const data = decode(formData, { arrays: ['book_ids'] })
+    const result = safeParse(schema, data)
+
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    const { book_ids, list_id } = result.output
+    const stmt = book_ids.map((id) =>
+      db //
+        .prepare(
+          `INSERT INTO books_lists
+          (id, book_id, list_id, created_on)
+          VALUES(?, ?, ?, ?)`
+        )
+        .bind(generateId(15), id, list_id, Date.now())
+    )
+
+    await db.batch(stmt)
+
+    return Response.json(
+      { data: null, success: true, errors: null },
       { status: 202 }
     )
   },

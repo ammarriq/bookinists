@@ -65,7 +65,7 @@
 
     <aside class="flex gap-2 ml-auto">
       {#if selectedBooks.length}
-        <SelectionActions />
+        <SelectionActions bind:books={selectedBooks} />
       {/if}
 
       <Button class="py-1.5 px-2">
