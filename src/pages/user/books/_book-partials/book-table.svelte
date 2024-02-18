@@ -64,13 +64,13 @@
     </form>
 
     <aside class="flex gap-2 ml-auto">
-      <Button class="py-1.5 px-2">
-        <i class="icon-[tabler--filter] size-4" />
-      </Button>
-
       {#if selectedBooks.length}
         <SelectionActions />
       {/if}
+
+      <Button class="py-1.5 px-2">
+        <i class="icon-[tabler--filter] size-4" />
+      </Button>
     </aside>
   </header>
 

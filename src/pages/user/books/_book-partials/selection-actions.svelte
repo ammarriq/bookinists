@@ -61,13 +61,6 @@
   <i class="icon-[tabler--send] size-4" />
 </Button>
 
-<Button
-  class="py-1.5 px-2 text-white bg-red-500 hover:bg-red-500/90"
-  on:click={deleteBook}
->
-  <i class="icon-[tabler--trash] size-4" />
-</Button>
-
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Portal>
     <Dialog.Overlay

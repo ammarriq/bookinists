@@ -11,6 +11,7 @@ const getSchema = async () => {
     .replaceAll('\r', '')
     .replaceAll('\n', '')
     .replaceAll(';', ';\n')
+    .replaceAll(/;\n\s+END;/g, '; END;')
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
