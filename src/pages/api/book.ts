@@ -350,7 +350,57 @@ export const POST = createActions({
         .bind(generateId(15), id, list_id, Date.now())
     )
 
-    await db.batch(stmt)
+    try {
+      await db.batch(stmt)
+    } catch (err) {
+      console.error(err)
+    }
+
+    return Response.json(
+      { data: null, success: true, errors: null },
+      { status: 202 }
+    )
+  },
+  move_to_tag: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
+
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
+
+    const schema = object({
+      tag_id: string([length(15)]),
+      book_ids: array(string([length(15)])),
+    })
+
+    const formData = await request.formData()
+    const data = decode(formData, { arrays: ['book_ids'] })
+    const result = safeParse(schema, data)
+
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    const { book_ids, tag_id } = result.output
+    const stmt = book_ids.map((id) =>
+      db //
+        .prepare(
+          `INSERT INTO books_tags
+          (id, book_id, tag_id, created_on)
+          VALUES(?, ?, ?, ?)`
+        )
+        .bind(generateId(15), id, tag_id, Date.now())
+    )
+
+    try {
+      await db.batch(stmt)
+    } catch (err) {
+      console.error(err)
+    }
 
     return Response.json(
       { data: null, success: true, errors: null },

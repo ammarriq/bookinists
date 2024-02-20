@@ -48,12 +48,32 @@ CREATE TABLE IF NOT EXISTS tags (
    created_on INTEGER
 );
 
+-- DROP TABLE IF EXISTS tags_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS tags_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS tags_ai AFTER INSERT ON tags
+   BEGIN
+      INSERT INTO tags_fts (id, name) VALUES (NEW.id, NEW.name);
+   END;
+
+CREATE TRIGGER IF NOT EXISTS tags_au AFTER UPDATE ON tags
+   BEGIN
+      UPDATE tags_fts SET name = NEW.name WHERE id = OLD.id;
+   END;
+
+CREATE TRIGGER IF NOT EXISTS tags_ad AFTER DELETE ON tags
+   BEGIN
+      DELETE FROM tags_fts WHERE id = OLD.id;
+   END;
+
 -- DROP TABLE IF EXISTS books_tags;
 CREATE TABLE IF NOT EXISTS books_tags (
    id TEXT PRIMARY KEY,
    book_id TEXT,
    tag_id TEXT,
    "order" INTEGER,
+   created_on INTEGER,
+   CONSTRAINT book_tag UNIQUE (book_id, tag_id),
    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE
    SET NULL,
       FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE
@@ -297,19 +317,8 @@ CREATE TABLE IF NOT EXISTS lists (
    created_on INTEGER
 );
 
--- DROP TABLE IF EXISTS books_lists;
-CREATE TABLE IF NOT EXISTS books_lists (
-   id TEXT PRIMARY KEY,
-   book_id TEXT,
-   list_id TEXT,
-   "order" INTEGER,
-   created_on INTEGER,
-   FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
-   FOREIGN KEY (list_id) REFERENCES lists(id) ON DELETE CASCADE
-);
-
 -- DROP TABLE IF EXISTS lists_fts;
-CREATE VIRTUAL TABLE IF NOT EXISTS lists_fts USING fts5(id, name);
+CREATE VIRTUAL TABLE IF NOT EXISTS lists_fts USING fts5(id UNINDEXED, name);
 
 CREATE TRIGGER IF NOT EXISTS lists_ai AFTER INSERT ON lists
    BEGIN
@@ -325,6 +334,18 @@ CREATE TRIGGER IF NOT EXISTS lists_ad AFTER DELETE ON lists
    BEGIN
       DELETE FROM lists_fts WHERE id = OLD.id;
    END;
+
+-- DROP TABLE IF EXISTS books_lists;
+CREATE TABLE IF NOT EXISTS books_lists (
+   id TEXT PRIMARY KEY,
+   book_id TEXT,
+   list_id TEXT,
+   "order" INTEGER,
+   created_on INTEGER,
+   CONSTRAINT book_list UNIQUE (book_id, list_id),
+   FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+   FOREIGN KEY (list_id) REFERENCES lists(id) ON DELETE CASCADE
+);
 
 -- DROP TABLE IF EXISTS contacts;
 CREATE TABLE IF NOT EXISTS contacts (

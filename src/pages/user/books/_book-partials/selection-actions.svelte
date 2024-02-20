@@ -3,7 +3,7 @@
   import type { Book } from '@/pages/api/book'
 
   import { fade, fly } from 'svelte/transition'
-  import { Dialog, Combobox } from 'bits-ui'
+  import { DropdownMenu as Dropdown, Dialog, Combobox } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
   import { debounce } from '@/lib/utils'
   import Field from '@/components/field.svelte'
@@ -14,7 +14,8 @@
   let submitting = false
   let dialogOpen = false
 
-  let lists: Record<'value' | 'label', string>[] = []
+  let moveTo = ''
+  let items: Record<'value' | 'label', string>[] = []
   let errors: Record<keyof Book, string[]> | null = null
 
   const editBook: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -37,11 +38,11 @@
   }
 
   const debouncedFetch = debounce(async (value: string) => {
-    const res = await fetch(`/api/list?query=${value}`)
-    const json = (await res.json()) as FetchResponse<typeof lists>
+    const res = await fetch(`/api/${moveTo}?query=${value}`)
+    const json = (await res.json()) as FetchResponse<typeof items>
     submitting = false
 
-    lists = json.data ?? []
+    items = json.data ?? []
   }, 500)
 
   const onInput = (e: unknown) => {
@@ -54,9 +55,62 @@
   }
 </script>
 
-<Button class="py-1.5 px-2" on:click={() => (dialogOpen = true)}>
-  <i class="icon-[tabler--send] size-4" />
-</Button>
+<Dropdown.Root>
+  <Dropdown.Trigger asChild let:builder>
+    <Button use={builder.action} {...builder} class="py-1.5 px-2">
+      <i class="icon-[tabler--send] size-4" />
+    </Button>
+  </Dropdown.Trigger>
+
+  <Dropdown.Content
+    transition={(e) => fly(e, { duration: 150, y: 10 })}
+    align="end"
+    class="rounded-md w-36 text-sm bg-white shadow mt-1"
+  >
+    <Dropdown.Label class="px-3 py-1.5 capitalize font-semibold">
+      Add to
+    </Dropdown.Label>
+    <Dropdown.Separator class="bg-slate-100 h-px" />
+    <Dropdown.Group class="p-1">
+      <Dropdown.Item
+        class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
+        on:click={() => {
+          dialogOpen = true
+          moveTo = 'list'
+        }}
+      >
+        List
+      </Dropdown.Item>
+      <Dropdown.Item
+        class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
+        on:click={() => {
+          dialogOpen = true
+          moveTo = 'tag'
+        }}
+      >
+        Tag
+      </Dropdown.Item>
+      <Dropdown.Item
+        class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
+        on:click={() => {
+          dialogOpen = true
+          moveTo = 'genre'
+        }}
+      >
+        Genre
+      </Dropdown.Item>
+      <Dropdown.Item
+        class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
+        on:click={() => {
+          dialogOpen = true
+          moveTo = 'collection'
+        }}
+      >
+        Collection
+      </Dropdown.Item>
+    </Dropdown.Group>
+  </Dropdown.Content>
+</Dropdown.Root>
 
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Portal>
@@ -85,7 +139,7 @@
         </Dialog.Title>
 
         <form
-          action="/api/book?move_to_list"
+          action="/api/book?move_to_{moveTo}"
           method="post"
           class="space-y-4"
           on:submit|preventDefault={editBook}
@@ -94,9 +148,9 @@
             <input type="hidden" name="book_ids" value={book} />
           {/each}
 
-          <Field label="Select list" error={errors?.read_status}>
+          <Field label="Select {moveTo}" error={errors?.read_status}>
             <Combobox.Root portal=".dialog">
-              <Combobox.HiddenInput name="list_id" />
+              <Combobox.HiddenInput name="{moveTo}_id" />
               <Combobox.Input
                 on:input={onInput}
                 type="text"
@@ -109,7 +163,7 @@
                 transition={(e) => fly(e, { duration: 150, y: -5 })}
                 sideOffset={8}
               >
-                {#each lists as { value, label } (value)}
+                {#each items as { value, label } (value)}
                   <Combobox.Item
                     class="px-2 py-1 text-sm capitalize rounded-md cursor-default hover:bg-slate-100"
                     {value}
