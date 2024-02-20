@@ -1,8 +1,8 @@
 import type { APIContext, APIRoute } from 'astro'
-import { flatten, type Issues } from 'valibot'
+import { flatten, type SchemaIssues } from 'valibot'
 import { toast } from 'svelte-sonner'
 
-export const getValiErrors = (issues: Issues) => {
+export const getValiErrors = (issues: SchemaIssuez) => {
   const errors = flatten(issues).nested
 
   return Object.keys(errors).reduce((acc, curr) => {
