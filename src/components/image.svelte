@@ -1,14 +1,29 @@
 <script lang="ts">
   import type { HTMLImgAttributes } from 'svelte/elements'
-  import Url from './url.svelte'
 
   type $$Props = HTMLImgAttributes
   export let src: $$Props['src'] = ''
   export let alt: $$Props['alt'] = ''
+
+  const getUrl = (key: string) => {
+    return `${import.meta.env.PUBLIC_BASE_URL}/api/file?key=${key}`
+  }
+
+  const loadImg = async () => {
+    return new Promise((resolve, reject) => {
+      const image = new Image()
+      image.src = getUrl(src ?? '')
+
+      image.onload = resolve
+      image.onerror = reject
+    })
+  }
 </script>
 
-<Url key={src ?? ''} let:url>
-  <slot slot="fallback" name="fallback" />
-  <img {...$$restProps} src={url} {alt} />
-  <slot slot="catch" name="catch" />
-</Url>
+{#await loadImg()}
+  <slot name="fallback" />
+{:then _}
+  <img {...$$restProps} src={getUrl(src ?? '')} {alt} />
+{:catch}
+  <slot name="catch" />
+{/await}

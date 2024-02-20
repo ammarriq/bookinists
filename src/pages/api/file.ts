@@ -38,7 +38,12 @@ export const GET = (async ({ locals, url }) => {
     )
   }
 
-  return new Response(await object.arrayBuffer(), { status: 200 })
+  return new Response(await object.arrayBuffer(), {
+    status: 200,
+    headers: {
+      'Content-Type': object.httpMetadata?.contentType ?? '',
+    },
+  })
 }) satisfies APIRoute
 
 export const PUT = (async ({ locals, request }) => {

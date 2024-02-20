@@ -407,4 +407,50 @@ export const POST = createActions({
       { status: 202 }
     )
   },
+  move_to_genre: async ({ locals, request }) => {
+    const db = locals.runtime.env.SITE_DB
+
+    if (!locals.user) {
+      return new Response(null, { status: 401 })
+    }
+
+    const schema = object({
+      genre_id: string([length(15)]),
+      book_ids: array(string([length(15)])),
+    })
+
+    const formData = await request.formData()
+    const data = decode(formData, { arrays: ['book_ids'] })
+    const result = safeParse(schema, data)
+
+    if (!result.success) {
+      const errors = flatten(result.issues).nested
+      return Response.json(
+        { data: null, success: false, errors },
+        { status: 400 }
+      )
+    }
+
+    const { book_ids, genre_id } = result.output
+    const stmt = book_ids.map((id) =>
+      db //
+        .prepare(
+          `UPDATE books
+          SET genre_id=?
+          WHERE id=?`
+        )
+        .bind(genre_id, id)
+    )
+
+    try {
+      await db.batch(stmt)
+    } catch (err) {
+      console.error(err)
+    }
+
+    return Response.json(
+      { data: null, success: true, errors: null },
+      { status: 202 }
+    )
+  },
 })

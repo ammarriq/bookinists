@@ -97,6 +97,24 @@ CREATE TABLE IF NOT EXISTS genres (
    created_on INTEGER
 );
 
+-- DROP TABLE IF EXISTS genres_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS genres_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS genres_ai AFTER INSERT ON genres
+   BEGIN
+      INSERT INTO genres_fts (id, name) VALUES (NEW.id, NEW.name);
+   END;
+
+CREATE TRIGGER IF NOT EXISTS genres_au AFTER UPDATE ON genres
+   BEGIN
+      UPDATE genres_fts SET name = NEW.name WHERE id = OLD.id;
+   END;
+
+CREATE TRIGGER IF NOT EXISTS genres_ad AFTER DELETE ON genres
+   BEGIN
+      DELETE FROM genres_fts WHERE id = OLD.id;
+   END;
+
 -- DROP TABLE IF EXISTS authors;
 CREATE TABLE IF NOT EXISTS authors (
    id TEXT PRIMARY KEY,
