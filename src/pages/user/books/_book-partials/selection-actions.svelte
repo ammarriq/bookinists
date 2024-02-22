@@ -99,15 +99,6 @@
       >
         Genre
       </Dropdown.Item>
-      <Dropdown.Item
-        class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-        on:click={() => {
-          dialogOpen = true
-          moveTo = 'collection'
-        }}
-      >
-        Collection
-      </Dropdown.Item>
     </Dropdown.Group>
   </Dropdown.Content>
 </Dropdown.Root>
