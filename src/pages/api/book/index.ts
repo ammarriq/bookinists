@@ -34,7 +34,7 @@ const BookSchema = object({
     maxValue(5, 'Must be less than 5'),
   ]),
   review: string('Review is required'),
-  genre_id: nullable(string()),
+  genre_id: optional(string()),
   created_on: optional(number()),
 })
 
@@ -57,7 +57,11 @@ const decoder = {
   arrays: ['tags', 'authors'], // isbn decoder
 }
 
-export type Book = Required<Output<typeof BookSchema>>
+export type Book = ToKeyType<
+  Required<Output<typeof BookSchema>>,
+  'genre_id',
+  null
+>
 
 export const POST = createActions({
   add: async ({ locals, request }) => {

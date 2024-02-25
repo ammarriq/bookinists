@@ -7,6 +7,7 @@
   import { Select } from 'bits-ui'
   import { read_status } from '@/lib/constants'
   import Field from '@/components/field.svelte'
+  import Genre from './genre-id.svelte'
 
   export let dialogOpen: boolean
 
@@ -122,6 +123,10 @@
       shadow-sm focus:outline-slate-900"
       class:border-red-500={!!errors?.review}
     />
+  </Field>
+
+  <Field label="Genre" error={errors?.genre_id}>
+    <Genre />
   </Field>
 
   <button

@@ -38,7 +38,7 @@
   }
 
   const debouncedFetch = debounce(async (value: string) => {
-    const res = await fetch(`/api/${moveTo}?query=${value}`)
+    const res = await fetch(`/api/${moveTo}/search?query=${value}`)
     const json = (await res.json()) as FetchResponse<typeof items>
     submitting = false
 

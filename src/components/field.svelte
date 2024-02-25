@@ -1,5 +1,6 @@
 <script lang="ts">
   let clazz = ''
+
   export { clazz as class }
   export let label = ''
   export let error: string[] = []

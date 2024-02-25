@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Genre as IGenre } from '@/pages/api/genre'
+  import type { Genre as IGenre } from '@/pages/api/genre/index'
 
   import EmptyPlaceholder from '@/components/empty-placeholder.svelte'
   import Pagination from '@/components/pagination.svelte'

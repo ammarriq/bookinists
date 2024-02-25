@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Genre } from '@/pages/api/genre'
+  import type { Genre } from '@/pages/api/genre/index'
 
-  import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
+  import { fade, fly } from 'svelte/transition'
   import { Dialog, DropdownMenu as Dropdown } from 'bits-ui'
   import Field from '@/components/field.svelte'
 

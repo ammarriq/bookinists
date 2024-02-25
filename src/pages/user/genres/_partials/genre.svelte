@@ -1,8 +1,7 @@
 <script lang="ts">
-  import type { Genre } from '@/pages/api/genre'
+  import type { Genre } from '@/pages/api/genre/index'
 
   import GenreActions from './genre-actions.svelte'
-
   export let genre: Genre
 </script>
 

@@ -9,6 +9,7 @@
   import { read_status } from '@/lib/constants'
   import Field from '@/components/field.svelte'
   import BookAuthor from './book_author.svelte'
+  import Genre from './genre-id.svelte'
 
   export let book: Book
 
@@ -240,8 +241,11 @@
             />
           </Field>
 
+          <Field label="Genre" error={errors?.genre_id}>
+            <Genre genre_id={book.genre_id} />
+          </Field>
+
           <input type="hidden" name="id" value={book.id} />
-          <input type="hidden" name="genre_id" value={book.genre_id} />
 
           <button
             class="flex items-center justify-center text-sm text-white font-medium
