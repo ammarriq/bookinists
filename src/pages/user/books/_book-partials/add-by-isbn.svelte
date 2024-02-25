@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
   import type { ISBNBook } from '@/lib/types'
-  import type { Book } from '@/pages/api/book'
+  import type { Book } from '@/pages/api/book/index'
 
   import { createEventDispatcher } from 'svelte'
   import { toast } from 'svelte-sonner'

@@ -127,12 +127,31 @@ CREATE TABLE IF NOT EXISTS authors (
    SET NULL
 );
 
+-- DROP TABLE IF EXISTS authors_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS authors_fts USING fts5(id UNINDEXED, name, avatar UNINDEXED);
+
+CREATE TRIGGER IF NOT EXISTS authors_ai AFTER INSERT ON authors
+   BEGIN
+      INSERT INTO authors_fts (id, name, avatar) VALUES (NEW.id, NEW.name, NEW.avatar);
+   END;
+
+CREATE TRIGGER IF NOT EXISTS authors_au AFTER UPDATE ON authors
+   BEGIN
+      UPDATE authors_fts SET name = NEW.name, avatar = NEW.avatar WHERE id = OLD.id;
+   END;
+
+CREATE TRIGGER IF NOT EXISTS authors_ad AFTER DELETE ON authors
+   BEGIN
+      DELETE FROM authors_fts WHERE id = OLD.id;
+   END;
+
 -- DROP TABLE IF EXISTS books_authors;
 CREATE TABLE IF NOT EXISTS books_authors (
    id TEXT PRIMARY KEY,
    book_id TEXT,
    author_id TEXT,
    "order" INTEGER,
+   created_on INTEGER,
    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE
    SET NULL,
       FOREIGN KEY (author_id) REFERENCES authors (id) ON DELETE

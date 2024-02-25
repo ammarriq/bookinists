@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Book } from '@/pages/api/book'
+  import type { Book } from '@/pages/api/book/index'
 
   import { createEventDispatcher } from 'svelte'
   import { fly } from 'svelte/transition'

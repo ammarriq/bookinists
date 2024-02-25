@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Book } from '@/pages/api/book'
+  import type { Book } from '@/pages/api/book/index'
 
   import { Switch } from 'bits-ui'
   import Pagination from '@/components/pagination.svelte'

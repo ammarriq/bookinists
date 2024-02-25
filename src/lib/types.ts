@@ -20,3 +20,5 @@ export type ISBNBook = {
   title: string
   subtitle?: string
 }
+
+export type SelectItem = Record<'value' | 'label', string>

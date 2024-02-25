@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Book } from '@/pages/api/book'
+  import type { Book } from '@/pages/api/book/index'
 
   import { createEventDispatcher } from 'svelte'
   import { Switch } from 'bits-ui'
