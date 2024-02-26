@@ -91,18 +91,25 @@ export const POST = createActions({
       read_status: result.output.read_status,
       rating: result.output.rating,
       review: result.output.review,
-      genre_id: result.output.genre_id || null,
+      genre_id: result.output.genre_id ?? null,
       created_on: Date.now(),
     }
 
-    await db
-      .prepare(
-        `INSERT INTO books
-        (id, title, url, excerpt, read_status, rating, review, genre_id, created_on) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    try {
+      await db
+        .prepare(
+          `INSERT INTO books
+          (id, title, url, excerpt, read_status, rating, review, genre_id, created_on) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .bind(...Object.values(book))
+        .run()
+    } catch (error) {
+      return Response.json(
+        { data: error.message, success: true, errors: null },
+        { status: 500 }
       )
-      .bind(...Object.values(book))
-      .run()
+    }
 
     return Response.json(
       { data: book, success: true, errors: null },
