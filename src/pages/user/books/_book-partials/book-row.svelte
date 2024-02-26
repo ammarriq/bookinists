@@ -35,7 +35,7 @@
   </td>
   <td class="py-2.5 px-4 whitespace-nowrap">
     <a
-      href="/user/books/{book.id}"
+      href="/user/books/editions/all/{book.id}"
       class="text-slate-900 font-medium min-w-max"
     >
       {book.title ?? ''}

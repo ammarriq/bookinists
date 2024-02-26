@@ -16,7 +16,7 @@
 <tr class="text-sm border-b">
   <td class="py-2.5 px-4 whitespace-nowrap">
     <a
-      href="/user/books/{book_id}/edit/{edition.id}"
+      href="/user/books/editions/edit/{book_id}-{edition.id}"
       class="text-slate-900 font-medium min-w-max"
     >
       {edition.isbn13 ?? ''}

@@ -6,6 +6,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
 import Form from './_form.svelte'
 
 const db = Astro.locals.runtime.env.SITE_DB
+console.log('running')
 
 const user = Astro.locals.user
 if (!user) return Astro.redirect('/login')

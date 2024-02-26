@@ -47,7 +47,7 @@
       </button>
 
       <a
-        href="/user/books/{book_id}/add"
+        href="/user/books/editions/add/{book_id}"
         class="flex items-center gap-1 text-sm text-white font-medium
         px-4 py-1.5 border shadow-sm rounded-md
         whitespace-nowrap bg-slate-900 hover:bg-slate-900/90"
