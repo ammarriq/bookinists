@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { verifyRequestOrigin } from 'lucia'
+import { generateId, verifyRequestOrigin } from 'lucia'
 import { initLucia } from '@/lib/auth'
 
 const getSchema = async () => {

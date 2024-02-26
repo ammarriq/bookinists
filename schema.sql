@@ -52,26 +52,20 @@ CREATE TABLE IF NOT EXISTS tags (
 CREATE VIRTUAL TABLE IF NOT EXISTS tags_fts USING fts5(id UNINDEXED, name);
 
 CREATE TRIGGER IF NOT EXISTS tags_ai AFTER INSERT ON tags
-   BEGIN
-      INSERT INTO tags_fts (id, name) VALUES (NEW.id, NEW.name);
-   END;
+   BEGIN INSERT INTO tags_fts (id, name) VALUES (NEW.id, NEW.name); END;
 
 CREATE TRIGGER IF NOT EXISTS tags_au AFTER UPDATE ON tags
-   BEGIN
-      UPDATE tags_fts SET name = NEW.name WHERE id = OLD.id;
-   END;
+   BEGIN UPDATE tags_fts SET name = NEW.name WHERE id = OLD.id; END;
 
 CREATE TRIGGER IF NOT EXISTS tags_ad AFTER DELETE ON tags
-   BEGIN
-      DELETE FROM tags_fts WHERE id = OLD.id;
-   END;
+   BEGIN DELETE FROM tags_fts WHERE id = OLD.id; END;
 
 -- DROP TABLE IF EXISTS books_tags;
 CREATE TABLE IF NOT EXISTS books_tags (
    id TEXT PRIMARY KEY,
    book_id TEXT,
    tag_id TEXT,
-   "order" INTEGER,
+   rank TEXT,
    created_on INTEGER,
    CONSTRAINT book_tag UNIQUE (book_id, tag_id),
    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE
@@ -101,19 +95,13 @@ CREATE TABLE IF NOT EXISTS genres (
 CREATE VIRTUAL TABLE IF NOT EXISTS genres_fts USING fts5(id UNINDEXED, name);
 
 CREATE TRIGGER IF NOT EXISTS genres_ai AFTER INSERT ON genres
-   BEGIN
-      INSERT INTO genres_fts (id, name) VALUES (NEW.id, NEW.name);
-   END;
+   BEGIN INSERT INTO genres_fts (id, name) VALUES (NEW.id, NEW.name); END;
 
 CREATE TRIGGER IF NOT EXISTS genres_au AFTER UPDATE ON genres
-   BEGIN
-      UPDATE genres_fts SET name = NEW.name WHERE id = OLD.id;
-   END;
+   BEGIN UPDATE genres_fts SET name = NEW.name WHERE id = OLD.id; END;
 
 CREATE TRIGGER IF NOT EXISTS genres_ad AFTER DELETE ON genres
-   BEGIN
-      DELETE FROM genres_fts WHERE id = OLD.id;
-   END;
+   BEGIN DELETE FROM genres_fts WHERE id = OLD.id; END;
 
 -- DROP TABLE IF EXISTS authors;
 CREATE TABLE IF NOT EXISTS authors (
@@ -131,26 +119,20 @@ CREATE TABLE IF NOT EXISTS authors (
 CREATE VIRTUAL TABLE IF NOT EXISTS authors_fts USING fts5(id UNINDEXED, name, avatar UNINDEXED);
 
 CREATE TRIGGER IF NOT EXISTS authors_ai AFTER INSERT ON authors
-   BEGIN
-      INSERT INTO authors_fts (id, name, avatar) VALUES (NEW.id, NEW.name, NEW.avatar);
-   END;
+   BEGIN INSERT INTO authors_fts (id, name, avatar) VALUES (NEW.id, NEW.name, NEW.avatar); END;
 
 CREATE TRIGGER IF NOT EXISTS authors_au AFTER UPDATE ON authors
-   BEGIN
-      UPDATE authors_fts SET name = NEW.name, avatar = NEW.avatar WHERE id = OLD.id;
-   END;
+   BEGIN UPDATE authors_fts SET name = NEW.name, avatar = NEW.avatar WHERE id = OLD.id; END;
 
 CREATE TRIGGER IF NOT EXISTS authors_ad AFTER DELETE ON authors
-   BEGIN
-      DELETE FROM authors_fts WHERE id = OLD.id;
-   END;
+   BEGIN DELETE FROM authors_fts WHERE id = OLD.id; END;
 
 -- DROP TABLE IF EXISTS books_authors;
 CREATE TABLE IF NOT EXISTS books_authors (
    id TEXT PRIMARY KEY,
    book_id TEXT,
    author_id TEXT,
-   "order" INTEGER,
+   rank TEXT,
    created_on INTEGER,
    FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE
    SET NULL,
@@ -281,7 +263,7 @@ CREATE TABLE IF NOT EXISTS editions_images (
    id TEXT PRIMARY KEY,
    image TEXT,
    type TEXT,
-   "order" INTEGER,
+   rank TEXT,
    edition_id TEXT,
    created_on INTEGER,
    FOREIGN KEY (edition_id) REFERENCES editions (id) ON DELETE
@@ -358,26 +340,20 @@ CREATE TABLE IF NOT EXISTS lists (
 CREATE VIRTUAL TABLE IF NOT EXISTS lists_fts USING fts5(id UNINDEXED, name);
 
 CREATE TRIGGER IF NOT EXISTS lists_ai AFTER INSERT ON lists
-   BEGIN
-      INSERT INTO lists_fts (id, name) VALUES (NEW.id, NEW.name);
-   END;
+   BEGIN INSERT INTO lists_fts (id, name) VALUES (NEW.id, NEW.name); END;
 
 CREATE TRIGGER IF NOT EXISTS lists_au AFTER UPDATE ON lists
-   BEGIN
-      UPDATE lists_fts SET name = NEW.name WHERE id = OLD.id;
-   END;
+   BEGIN UPDATE lists_fts SET name = NEW.name WHERE id = OLD.id; END;
 
 CREATE TRIGGER IF NOT EXISTS lists_ad AFTER DELETE ON lists
-   BEGIN
-      DELETE FROM lists_fts WHERE id = OLD.id;
-   END;
+   BEGIN DELETE FROM lists_fts WHERE id = OLD.id; END;
 
 -- DROP TABLE IF EXISTS books_lists;
 CREATE TABLE IF NOT EXISTS books_lists (
    id TEXT PRIMARY KEY,
    book_id TEXT,
    list_id TEXT,
-   "order" INTEGER,
+   rank TEXT,
    created_on INTEGER,
    CONSTRAINT book_list UNIQUE (book_id, list_id),
    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,

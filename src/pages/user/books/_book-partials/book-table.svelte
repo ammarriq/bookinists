@@ -86,7 +86,8 @@
               class="flex items-center justify-center
               border rounded-md shadow size-4 bg-white"
               onCheckedChange={selectAll}
-              checked={bookList.every((o) => selectedBooks.includes(o.id))}
+              checked={!!bookList.length &&
+                bookList.every((o) => selectedBooks.includes(o.id))}
             >
               <Switch.Input class="peer" name="use_whatsapp" />
               <i
