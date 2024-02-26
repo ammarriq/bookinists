@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS books (
    read_status TEXT,
    rating INTEGER,
    review TEXT,
-   genre_id,
+   genre_id TEXT,
    created_on INTEGER,
    FOREIGN KEY (genre_id) REFERENCES genres (id) ON DELETE
    SET NULL

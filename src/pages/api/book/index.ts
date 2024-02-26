@@ -91,7 +91,7 @@ export const POST = createActions({
       read_status: result.output.read_status,
       rating: result.output.rating,
       review: result.output.review,
-      genre_id: result.output.genre_id ?? null,
+      genre_id: result.output.genre_id || null,
       created_on: Date.now(),
     }
 
@@ -106,7 +106,7 @@ export const POST = createActions({
         .run()
     } catch (error) {
       return Response.json(
-        { data: error.message, success: true, errors: null },
+        { data: book, success: true, errors: error.message },
         { status: 500 }
       )
     }
