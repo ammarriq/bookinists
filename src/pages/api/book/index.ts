@@ -1,5 +1,5 @@
 import { read_status } from '@/lib/constants'
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
@@ -95,21 +95,14 @@ export const POST = createActions({
       created_on: Date.now(),
     }
 
-    try {
-      await db
-        .prepare(
-          `INSERT INTO books
+    await db
+      .prepare(
+        `INSERT INTO books
           (id, title, url, excerpt, read_status, rating, review, genre_id, created_on) 
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        )
-        .bind(...Object.values(book))
-        .run()
-    } catch (error) {
-      return Response.json(
-        { data: book, success: true, errors: error.message },
-        { status: 500 }
       )
-    }
+      .bind(...values(book))
+      .run()
 
     return Response.json(
       { data: book, success: true, errors: null },
@@ -190,10 +183,10 @@ export const POST = createActions({
     )
 
     await db.batch([
-      book_stmt.bind(...Object.values(book)),
-      ...authors.map((a) => author_stmt.bind(...Object.values(a))),
-      ...tags.map((a) => tag_stmt.bind(...Object.values(a))),
-      publisher_stmt.bind(...Object.values(publisher)),
+      book_stmt.bind(...values(book)),
+      ...authors.map((a) => author_stmt.bind(...values(a))),
+      ...tags.map((a) => tag_stmt.bind(...values(a))),
+      publisher_stmt.bind(...values(publisher)),
     ])
 
     const edition = {
@@ -227,7 +220,7 @@ export const POST = createActions({
     )
 
     await db.batch([
-      edition_stmt.bind(...Object.values(edition)),
+      edition_stmt.bind(...values(edition)),
       ...authors.map((a) => books_authors_stmt.bind(book.id, a.id)),
       ...tags.map((a) => books_tags_stmt.bind(book.id, a.id)),
     ])
@@ -246,7 +239,7 @@ export const POST = createActions({
         (id, edition_id, image, type, created_on) 
         VALUES (?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(edition_image))
+      .bind(...values(edition_image))
       .run()
 
     return Response.json(
@@ -289,7 +282,7 @@ export const POST = createActions({
         SET title=?, url=?, excerpt=?, read_status=?, rating=?, review=?, genre_id=?
         WHERE id=?`
       )
-      .bind(...Object.values(book), result.output.id)
+      .bind(...values(book), result.output.id)
       .run()
 
     return Response.json(

@@ -73,3 +73,7 @@ export const stars = (avg: number) =>
 
     return 'empty'
   })
+
+export const values = <T extends object>(obj: T) => {
+  return Object.values(obj).map((o) => (o === 'undefined' ? null : o))
+}

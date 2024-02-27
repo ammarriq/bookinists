@@ -1,4 +1,4 @@
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { storage_type } from '@/lib/constants'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
@@ -72,7 +72,7 @@ export const POST = createActions({
         (id, image, name, storage_type, color, width, height, depth, notes, created_on) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(storage))
+      .bind(...values(storage))
       .run()
 
     return Response.json(
@@ -116,7 +116,7 @@ export const POST = createActions({
         SET image=?, name=?, storage_type=?, color=?, width=?, height=?, depth=?, notes=?
         WHERE id=?`
       )
-      .bind(...Object.values(storage), result.output.id)
+      .bind(...values(storage), result.output.id)
       .run()
 
     return Response.json(

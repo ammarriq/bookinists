@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { array, minLength, object, string, safeParse, flatten } from 'valibot'
 import { generateId } from 'lucia'
@@ -84,7 +84,7 @@ export const POST = createActions({
 
     try {
       await db.batch([
-        ...book_authors.map((o) => insert_stmt.bind(...Object.values(o))),
+        ...book_authors.map((o) => insert_stmt.bind(...values(o))),
         ...remove_authors.map((o) => delete_stmt.bind(o)),
       ])
     } catch (error) {

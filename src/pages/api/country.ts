@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
@@ -73,7 +73,7 @@ export const POST = createActions({
         (id, name, flag, created_on) 
         VALUES (?, ?, ?, ?)`
       )
-      .bind(...Object.values(country))
+      .bind(...values(country))
       .run()
 
     return Response.json(
@@ -111,7 +111,7 @@ export const POST = createActions({
         SET name=?, flag=?
         WHERE id=?`
       )
-      .bind(...Object.values(country), result.output.id)
+      .bind(...values(country), result.output.id)
       .run()
 
     return Response.json(

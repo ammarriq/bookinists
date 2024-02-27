@@ -1,4 +1,4 @@
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
@@ -58,7 +58,7 @@ export const POST = createActions({
         (id, name, description, image, created_on) 
         VALUES (?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(collection))
+      .bind(...values(collection))
       .run()
 
     return Response.json(
@@ -97,7 +97,7 @@ export const POST = createActions({
         SET name=?, description=?, image=?
         WHERE id=?`
       )
-      .bind(...Object.values(collection), result.output.id)
+      .bind(...values(collection), result.output.id)
       .run()
 
     return Response.json(

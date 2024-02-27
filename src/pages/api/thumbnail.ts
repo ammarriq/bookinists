@@ -1,5 +1,5 @@
 import { thumbnail_type } from '@/lib/constants'
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
@@ -66,7 +66,7 @@ export const POST = createActions({
         (id, image, type, edition_id, "order", created_on) 
         VALUES (?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(thumbnail))
+      .bind(...values(thumbnail))
       .run()
 
     return Response.json(

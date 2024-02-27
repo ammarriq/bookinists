@@ -1,4 +1,4 @@
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
@@ -61,7 +61,7 @@ export const POST = createActions({
         (id, icon, name, description, url, created_on) 
         VALUES (?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(marketplace))
+      .bind(...values(marketplace))
       .run()
 
     return Response.json(
@@ -101,7 +101,7 @@ export const POST = createActions({
         SET icon=?, name=?, description=?, url=?
         WHERE id=?`
       )
-      .bind(...Object.values(marketplace), result.output.id)
+      .bind(...values(marketplace), result.output.id)
       .run()
 
     return Response.json(

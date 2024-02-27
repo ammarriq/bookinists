@@ -1,4 +1,4 @@
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { favorite_contact } from '@/lib/constants'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
@@ -98,7 +98,7 @@ export const POST = createActions({
           url, use_whatsapp, use_signal, is_professional, rating, note, country_id, created_on) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(contact))
+      .bind(...values(contact))
       .run()
 
     return Response.json(
@@ -150,7 +150,7 @@ export const POST = createActions({
         url=?, use_whatsapp=?, use_signal=?, is_professional=?, rating=?, note=?, country_id=?
         WHERE id=?`
       )
-      .bind(...Object.values(contact), result.output.id)
+      .bind(...values(contact), result.output.id)
       .run()
 
     return Response.json(

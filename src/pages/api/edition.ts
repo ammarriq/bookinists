@@ -9,7 +9,7 @@ import {
   lend_status,
   thumbnail_type,
 } from '@/lib/constants'
-import { createActions } from '@/lib/utils'
+import { createActions, values } from '@/lib/utils'
 import { decode } from 'decode-formdata'
 import { generateId } from 'lucia'
 import {
@@ -220,7 +220,7 @@ export const POST = createActions({
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(edition))
+      .bind(...values(edition))
       .run()
 
     const thumbnails: Omit<Thumbnail, 'is_new'>[] =
@@ -238,7 +238,7 @@ export const POST = createActions({
       VALUES(?, ?, ?, ?, ?, ?)`
 
     await db.batch([
-      ...thumbnails.map((o) => db.prepare(stmt).bind(...Object.values(o))),
+      ...thumbnails.map((o) => db.prepare(stmt).bind(...values(o))),
     ])
 
     return Response.json(
@@ -300,7 +300,7 @@ export const POST = createActions({
         (id, name, logo, info, country_id, created_on) 
         VALUES (?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(publisher))
+      .bind(...values(publisher))
       .run()
 
     await db
@@ -309,7 +309,7 @@ export const POST = createActions({
         (id, date, book_id, publisher_id, isbn, isbn13, pages, language_iso, created_on) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(edition))
+      .bind(...values(edition))
       .run()
 
     await db
@@ -318,7 +318,7 @@ export const POST = createActions({
         (id, edition_id, image, type, created_on) 
         VALUES (?, ?, ?, ?, ?)`
       )
-      .bind(...Object.values(edition_image))
+      .bind(...values(edition_image))
       .run()
 
     return Response.json(
@@ -403,7 +403,7 @@ export const POST = createActions({
         sell_price=?, sell_date=?, buyer_id=?, lend_status=?, lender_id=?, lending_time=?
         WHERE id=?`
       )
-      .bind(...Object.values(edition), result.output.id)
+      .bind(...values(edition), result.output.id)
       .run()
 
     const thumbnails: Partial<Thumbnail>[] = result.output.thumbnails.map(
@@ -434,10 +434,10 @@ export const POST = createActions({
           if (o.is_new) {
             return db
               .prepare(insert_stmt)
-              .bind(id, ...Object.values(thumbnail), created_on)
+              .bind(id, ...values(thumbnail), created_on)
           }
 
-          return db.prepare(update_stmt).bind(...Object.values(thumbnail), id)
+          return db.prepare(update_stmt).bind(...values(thumbnail), id)
         }),
       ])
     }
