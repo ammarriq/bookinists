@@ -35,7 +35,10 @@
   </div>
 {:then data}
   {@const countries = data.map((o) => ({ value: o.id, label: o.name }))}
-  <Select.Root selected={countries.find((o) => o.value === country_id)}>
+  <Select.Root
+    portal=".dialog"
+    selected={countries.find((o) => o.value === country_id)}
+  >
     <Select.Trigger
       class="flex items-center justify-between border w-full px-3
       py-1.5 rounded-md text-sm shadow-sm focus:outline-slate-900
