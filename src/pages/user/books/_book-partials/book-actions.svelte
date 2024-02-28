@@ -272,7 +272,7 @@
     />
 
     <Dialog.Content
-      class="dialog fixed inset-0 grid place-items-center
+      class="author-dialog fixed inset-0 grid place-items-center
       py-12 overflow-y-auto bg-transparent z-50"
     >
       <div

@@ -93,6 +93,7 @@
 
   <Select.Root
     multiple
+    portal=".author-dialog"
     onSelectedChange={(e) => {
       inputValue = ''
 
