@@ -68,10 +68,8 @@ CREATE TABLE IF NOT EXISTS books_tags (
    rank TEXT,
    created_on INTEGER,
    CONSTRAINT book_tag UNIQUE (book_id, tag_id),
-   FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE
-   SET NULL,
-      FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE
-   SET NULL
+   FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE,
+   FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
 );
 
 -- DROP TABLE IF EXISTS collections;
@@ -134,10 +132,8 @@ CREATE TABLE IF NOT EXISTS books_authors (
    author_id TEXT,
    rank TEXT,
    created_on INTEGER,
-   FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE
-   SET NULL,
-      FOREIGN KEY (author_id) REFERENCES authors (id) ON DELETE
-   SET NULL
+   FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE,
+   FOREIGN KEY (author_id) REFERENCES authors (id) ON DELETE CASCADE
 );
 
 -- DROP TABLE IF EXISTS publishers;
