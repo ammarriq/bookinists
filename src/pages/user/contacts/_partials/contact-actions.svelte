@@ -278,7 +278,7 @@
           <fieldset class="space-y-2 !mt-1 border p-3 shadow-sm rounded-md">
             <Field
               label="Whatsapp"
-              class="flex items-center gap-2 flex-row-reverse !space-y-0 max-w-max"
+              class="!flex items-center gap-2 flex-row-reverse !space-y-0 max-w-max"
               error={errors?.use_whatsapp}
             >
               <Switch.Root
@@ -296,7 +296,7 @@
 
             <Field
               label="Signal"
-              class="flex items-center gap-2 flex-row-reverse !space-y-0 max-w-max"
+              class="!flex items-center gap-2 flex-row-reverse !space-y-0 max-w-max"
               error={errors?.use_signal}
             >
               <Switch.Root
@@ -314,7 +314,7 @@
 
             <Field
               label="Professional"
-              class="flex items-center gap-2 flex-row-reverse !space-y-0 max-w-max"
+              class="!flex items-center gap-2 flex-row-reverse !space-y-0 max-w-max"
               error={errors?.is_professional}
             >
               <Switch.Root
