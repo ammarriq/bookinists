@@ -209,20 +209,24 @@ export const POST = createActions({
 
     const books_tags_stmt = db.prepare(
       `INSERT INTO books_tags
-      (book_id, tag_id)
-      VALUES (?, ?)`
+      (id, book_id, tag_id)
+      VALUES (?, ?, ?)`
     )
 
     const books_authors_stmt = db.prepare(
       `INSERT INTO books_authors
-      (book_id, author_id)
-      VALUES (?, ?)`
+      (id, book_id, author_id)
+      VALUES (?, ?, ?)`
     )
 
     await db.batch([
       edition_stmt.bind(...values(edition)),
-      ...authors.map((a) => books_authors_stmt.bind(book.id, a.id)),
-      ...tags.map((a) => books_tags_stmt.bind(book.id, a.id)),
+      ...authors.map((a) => {
+        return books_authors_stmt.bind(generateId(15), book.id, a.id)
+      }),
+      ...tags.map((a) => {
+        return books_tags_stmt.bind(generateId(15), book.id, a.id)
+      }),
     ])
 
     const edition_image = {
