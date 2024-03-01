@@ -37,6 +37,18 @@ CREATE TABLE IF NOT EXISTS books (
    SET NULL
 );
 
+-- DROP TABLE IF EXISTS books_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS books_fts USING fts5(id UNINDEXED, title);
+
+CREATE TRIGGER IF NOT EXISTS books_ai AFTER INSERT ON books
+   BEGIN INSERT INTO books_fts (id, title) VALUES (NEW.id, NEW.title); END;
+
+CREATE TRIGGER IF NOT EXISTS books_au AFTER UPDATE ON books
+   BEGIN UPDATE books_fts SET title = NEW.title WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS books_ad AFTER DELETE ON books
+   BEGIN DELETE FROM books_fts WHERE id = OLD.id; END;
+
 -- DROP TABLE IF EXISTS tags;
 CREATE TABLE IF NOT EXISTS tags (
    id TEXT PRIMARY KEY,
@@ -170,6 +182,18 @@ CREATE TABLE IF NOT EXISTS awards (
    FOREIGN KEY (country_id) REFERENCES countries (id) ON DELETE SET NULL
 );
 
+-- DROP TABLE IF EXISTS awards_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS awards_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS awards_ai AFTER INSERT ON awards
+   BEGIN INSERT INTO awards_fts (id, name) VALUES (NEW.id, NEW.name); END;
+
+CREATE TRIGGER IF NOT EXISTS awards_au AFTER UPDATE ON awards
+   BEGIN UPDATE awards_fts SET name = NEW.name WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS awards_ad AFTER DELETE ON awards
+   BEGIN DELETE FROM awards_fts WHERE id = OLD.id; END;
+
 -- DROP TABLE IF EXISTS awards_categories;
 CREATE TABLE IF NOT EXISTS awards_categories (
    id TEXT PRIMARY KEY,
@@ -178,6 +202,19 @@ CREATE TABLE IF NOT EXISTS awards_categories (
    description TEXT,
    created_on INTEGER
 );
+
+-- DROP TABLE IF EXISTS awards_categories_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS awards_categories_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS awards_categories_ai AFTER INSERT ON awards_categories
+   BEGIN INSERT INTO awards_categories_fts (id, name) VALUES (NEW.id, NEW.name); END;
+
+CREATE TRIGGER IF NOT EXISTS awards_categories_au AFTER UPDATE ON awards_categories
+   BEGIN UPDATE awards_categories_fts SET name = NEW.name WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS awards_categories_ad AFTER DELETE ON awards_categories
+   BEGIN DELETE FROM awards_categories_fts WHERE id = OLD.id; END;
+
 
 -- DROP TABLE IF EXISTS books_awards;
 CREATE TABLE IF NOT EXISTS books_awards (
@@ -188,7 +225,7 @@ CREATE TABLE IF NOT EXISTS books_awards (
    created_on INTEGER,
    FOREIGN KEY(book_id) REFERENCES books(id) ON DELETE CASCADE,
    FOREIGN KEY(award_id) REFERENCES awards(id) ON DELETE CASCADE,
-   FOREIGN KEY(award_category_id) REFERENCES award_categoriess(id) ON DELETE CASCADE
+   FOREIGN KEY(award_category_id) REFERENCES awards_categories(id) ON DELETE CASCADE
 );
 
 -- DROP TABLE IF EXISTS marketplaces;

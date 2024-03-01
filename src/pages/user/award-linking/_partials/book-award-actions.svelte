@@ -1,27 +1,30 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { AwardCategory as Category } from '@/pages/api/award-category'
+  import type { AwardLinking as BookAward } from '@/pages/api/award-linking'
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
   import { Dialog, DropdownMenu as Dropdown } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
   import Field from '@/components/field.svelte'
+  import BookSelect from './select-book.svelte'
+  import AwardSelect from './select-award.svelte'
+  import AwardCategorySelect from './select-award-category.svelte'
 
-  export let category: Category
+  export let bookAward: BookAward
 
   let submitting = false
   let dialogOpen = false
 
   let deleteForm: HTMLFormElement
-  let errors: Record<keyof Category, string[]> | null = null
+  let errors: Record<keyof BookAward, string[]> | null = null
 
   const dispatch = createEventDispatcher<{
-    edit: Category
+    edit: BookAward
     delete: string
   }>()
 
-  const editCategory: FormEventHandler<HTMLFormElement> = async (e) => {
+  const editAward: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
 
     const form = e.currentTarget
@@ -33,7 +36,7 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Category>
+    const json = (await res.json()) as FetchResponse<BookAward>
 
     if (!json.success) return (errors = json.errors)
 
@@ -41,8 +44,8 @@
     dispatch('edit', json.data)
   }
 
-  const deleteCategory = async () => {
-    if (!confirm('Are you sure you wanna delete the category?')) return
+  const deleteAward = async () => {
+    if (!confirm('Are you sure you wanna delete the award?')) return
     submitting = true
 
     const form = deleteForm
@@ -54,10 +57,10 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Category>
+    const json = (await res.json()) as FetchResponse<BookAward>
     if (!json.success) return (errors = json.errors)
 
-    dispatch('delete', category.id)
+    dispatch('delete', bookAward.id)
   }
 </script>
 
@@ -79,7 +82,7 @@
     </Dropdown.Item>
     <Dropdown.Item
       class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-      on:click={deleteCategory}
+      on:click={deleteAward}
       disabled={submitting}
     >
       <form
@@ -88,7 +91,7 @@
         bind:this={deleteForm}
         on:submit|preventDefault
       >
-        <input type="hidden" name="id" value={category.id} />
+        <input type="hidden" name="id" value={bookAward.id} />
         <button type="submit" disabled={submitting}>Delete</button>
       </form>
     </Dropdown.Item>
@@ -118,46 +121,28 @@
         />
 
         <Dialog.Title class="space-y-1 mb-4">
-          <h2 class="text-base font-semibold">Edit Category</h2>
+          <h2 class="text-base font-semibold">Edit Award</h2>
         </Dialog.Title>
 
         <form
-          action="/api/award-category?edit"
+          action="/api/award-linking?edit"
           method="post"
           class="space-y-4"
-          on:submit|preventDefault={editCategory}
+          on:submit|preventDefault={editAward}
         >
-          <input type="hidden" name="id" value={category.id} />
+          <input type="hidden" name="id" value={bookAward.id} />
 
-          <Field label="Name" error={errors?.name}>
-            <input
-              type="text"
-              name="name"
-              class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
-              shadow-sm focus:outline-slate-900"
-              class:border-red-500={!!errors?.name}
-              value={category.name}
-            />
+          <Field label="Book" error={errors?.book_id}>
+            <BookSelect book_id={bookAward.book_id} />
           </Field>
 
-          <Field label="URL" error={errors?.url}>
-            <input
-              type="text"
-              name="url"
-              class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
-              shadow-sm focus:outline-slate-900"
-              class:border-red-500={!!errors?.url}
-              value={category.url}
-            />
+          <Field label="Award" error={errors?.award_id}>
+            <AwardSelect award_id={bookAward.award_id} />
           </Field>
 
-          <Field label="Description" error={errors?.description}>
-            <textarea
-              name="description"
-              class="border w-full px-3 py-1.5 rounded-md text-sm
-              shadow-sm focus:outline-slate-900 h-20"
-              class:border-red-500={!!errors?.description}
-              value={category.description}
+          <Field label="Award category" error={errors?.award_category_id}>
+            <AwardCategorySelect
+              award_category_id={bookAward.award_category_id}
             />
           </Field>
 

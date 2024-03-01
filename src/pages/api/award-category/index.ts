@@ -13,7 +13,6 @@ import {
   number,
   optional,
   url,
-  nullable,
 } from 'valibot'
 
 const AwardCategorySchema = object({

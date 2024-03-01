@@ -1,8 +1,8 @@
 ---
-import type { Award } from '@/pages/api/award'
+import type { AwardLinking as BookAward } from '@/pages/api/award-linking'
 
 import AdminLayout from '@/layouts/AdminLayout.astro'
-import AwardCategory from './_partials/categories.svelte'
+import BookAwards from './_partials/book-awards.svelte'
 
 const PER_PAGE = 9
 const db = Astro.locals.runtime.env.SITE_DB
@@ -13,21 +13,21 @@ if (!user) return Astro.redirect('/login')
 const currentPage = +(Astro.url.searchParams.get('page') || '1')
 
 const getCount = db
-  .prepare('SELECT COUNT(*) AS total FROM awards_categories')
+  .prepare('SELECT COUNT(*) AS total FROM books_awards')
   .first<number>('total')
 
-const getAwards = db
-  .prepare('SELECT * FROM awards_categories LIMIT ? OFFSET ?')
+const getBookAwards = db
+  .prepare('SELECT * FROM books_awards LIMIT ? OFFSET ?')
   .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
-  .all<Award>()
+  .all<BookAward>()
 
-const [count, awards] = await Promise.all([getCount, getAwards])
+const [count, bookAwards] = await Promise.all([getCount, getBookAwards])
 ---
 
 <AdminLayout title="Admin | Bookinists">
   <main class="px-4 py-6">
-    <AwardCategory
-      categories={awards.results}
+    <BookAwards
+      bookAwards={bookAwards.results}
       count={count ?? 0}
       currentPage={currentPage}
       perPage={PER_PAGE}

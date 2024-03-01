@@ -52,6 +52,8 @@ export const POST = createActions({
       created_on: Date.now(),
     }
 
+    console.log(award_category)
+
     await db
       .prepare(
         `INSERT INTO books_awards

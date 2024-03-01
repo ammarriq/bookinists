@@ -9,6 +9,7 @@
   import Field from '@/components/field.svelte'
   import FileDropzone from '@/components/file-dropzone.svelte'
   import CountrySelect from '../../_country-select.svelte'
+  import GenreSelect from './genre-select.svelte'
 
   export let award: Award
 
@@ -106,7 +107,7 @@
     />
 
     <Dialog.Content
-      class="fixed inset-0 grid place-items-center
+      class="dialog fixed inset-0 grid place-items-center
       py-12 overflow-y-auto bg-transparent z-50"
     >
       <div
@@ -159,6 +160,10 @@
               class:border-red-500={!!errors?.url}
               value={award.url}
             />
+          </Field>
+
+          <Field label="Genre" error={errors?.country_id}>
+            <GenreSelect genre_id={award.genre_id} />
           </Field>
 
           <Field label="Country" error={errors?.country_id}>

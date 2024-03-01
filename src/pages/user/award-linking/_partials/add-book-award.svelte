@@ -1,19 +1,22 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { AwardCategory as Category } from '@/pages/api/award-category'
+  import type { AwardLinking as BookAward } from '@/pages/api/award-linking'
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
   import { Dialog } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
   import Field from '@/components/field.svelte'
+  import BookSelect from './select-book.svelte'
+  import AwardSelect from './select-award.svelte'
+  import AwardCategorySelect from './select-award-category.svelte'
 
   export let dialogOpen = false
 
   let submitting = false
-  let errors: Record<keyof Category, string[]> | null = null
+  let errors: Record<keyof BookAward, string[]> | null = null
 
-  const dispatch = createEventDispatcher<{ submit: Category }>()
+  const dispatch = createEventDispatcher<{ submit: BookAward }>()
 
   const submit: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
@@ -27,7 +30,7 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Category>
+    const json = (await res.json()) as FetchResponse<BookAward>
     if (!json.success) return (errors = json.errors)
 
     dispatch('submit', json.data)
@@ -43,7 +46,7 @@
     />
 
     <Dialog.Content
-      class="fixed inset-0 grid place-items-center
+      class="dialog fixed inset-0 grid place-items-center
       py-12 overflow-y-auto bg-transparent z-50"
     >
       <div
@@ -62,38 +65,21 @@
         </Dialog.Title>
 
         <form
-          action="/api/award-category?add"
+          action="/api/award-linking?add"
           method="post"
           class="space-y-4"
           on:submit|preventDefault={submit}
         >
-          <Field label="Name" error={errors?.name}>
-            <input
-              type="text"
-              name="name"
-              class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
-              shadow-sm focus:outline-slate-900"
-              class:border-red-500={!!errors?.name}
-            />
+          <Field label="Book" error={errors?.book_id}>
+            <BookSelect />
           </Field>
 
-          <Field label="URL" error={errors?.url}>
-            <input
-              type="text"
-              name="url"
-              class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
-              shadow-sm focus:outline-slate-900"
-              class:border-red-500={!!errors?.url}
-            />
+          <Field label="Award" error={errors?.award_id}>
+            <AwardSelect />
           </Field>
 
-          <Field label="Description" error={errors?.description}>
-            <textarea
-              name="description"
-              class="border w-full px-3 py-1.5 rounded-md text-sm
-              shadow-sm focus:outline-slate-900 h-20"
-              class:border-red-500={!!errors?.description}
-            />
+          <Field label="Award category" error={errors?.award_category_id}>
+            <AwardCategorySelect />
           </Field>
 
           <button
