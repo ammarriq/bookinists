@@ -1,30 +1,21 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Award } from '@/pages/api/award'
+  import type { AwardCategory as Category } from '@/pages/api/award-category'
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
-  import { Dialog, DropdownMenu as Dropdown } from 'bits-ui'
+  import { Dialog } from 'bits-ui'
   import { clickParent } from '@/lib/actions'
   import Field from '@/components/field.svelte'
-  import FileDropzone from '@/components/file-dropzone.svelte'
-  import CountrySelect from '../../_country-select.svelte'
 
-  export let award: Award
+  export let dialogOpen = false
 
-  let imageKey = award.image
   let submitting = false
-  let dialogOpen = false
+  let errors: Record<keyof Category, string[]> | null = null
 
-  let deleteForm: HTMLFormElement
-  let errors: Record<keyof Award, string[]> | null = null
+  const dispatch = createEventDispatcher<{ submit: Category }>()
 
-  const dispatch = createEventDispatcher<{
-    edit: Award
-    delete: string
-  }>()
-
-  const editAward: FormEventHandler<HTMLFormElement> = async (e) => {
+  const submit: FormEventHandler<HTMLFormElement> = async (e) => {
     submitting = true
 
     const form = e.currentTarget
@@ -36,67 +27,13 @@
     })
 
     submitting = false
-    const json = (await res.json()) as FetchResponse<Omit<Award, 'icon'>>
-
+    const json = (await res.json()) as FetchResponse<Category>
     if (!json.success) return (errors = json.errors)
 
+    dispatch('submit', json.data)
     dialogOpen = false
-    dispatch('edit', { ...json.data, image: imageKey })
-  }
-
-  const deleteAward = async () => {
-    if (!confirm('Are you sure you wanna delete the award?')) return
-    submitting = true
-
-    const form = deleteForm
-    const formData = new FormData(form)
-
-    const res = await fetch(form.action, {
-      method: form.method,
-      body: formData,
-    })
-
-    submitting = false
-    const json = (await res.json()) as FetchResponse<Award>
-    if (!json.success) return (errors = json.errors)
-
-    dispatch('delete', award.id)
   }
 </script>
-
-<Dropdown.Root disableFocusFirstItem>
-  <Dropdown.Trigger class="size-5">
-    <i class="icon-[tabler--dots-vertical] text-slate-900 size-5" />
-  </Dropdown.Trigger>
-
-  <Dropdown.Content
-    transition={(e) => fly(e, { duration: 150, y: 10 })}
-    align="end"
-    class="p-1 rounded-md w-40 text-sm bg-white shadow mt-1"
-  >
-    <Dropdown.Item
-      class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-      on:click={() => (dialogOpen = true)}
-    >
-      Edit
-    </Dropdown.Item>
-    <Dropdown.Item
-      class="text-left w-full px-3 py-1.5 rounded-md hover:bg-slate-100"
-      on:click={deleteAward}
-      disabled={submitting}
-    >
-      <form
-        action="/api/award?delete"
-        method="post"
-        bind:this={deleteForm}
-        on:submit|preventDefault
-      >
-        <input type="hidden" name="id" value={award.id} />
-        <button type="submit" disabled={submitting}>Delete</button>
-      </form>
-    </Dropdown.Item>
-  </Dropdown.Content>
-</Dropdown.Root>
 
 <Dialog.Root bind:open={dialogOpen}>
   <Dialog.Portal>
@@ -121,24 +58,15 @@
         />
 
         <Dialog.Title class="space-y-1 mb-4">
-          <h2 class="text-base font-semibold">Edit Award</h2>
+          <h2 class="text-base font-semibold">Add Category</h2>
         </Dialog.Title>
 
         <form
-          action="/api/award?edit"
+          action="/api/award-category?add"
           method="post"
           class="space-y-4"
-          on:submit|preventDefault={editAward}
+          on:submit|preventDefault={submit}
         >
-          <input type="hidden" name="id" value={award.id} />
-
-          <FileDropzone
-            name="image"
-            error={errors?.image}
-            status={imageKey ? 'resolved' : 'idle'}
-            bind:key={imageKey}
-          />
-
           <Field label="Name" error={errors?.name}>
             <input
               type="text"
@@ -146,7 +74,6 @@
               class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.name}
-              value={award.name}
             />
           </Field>
 
@@ -157,14 +84,6 @@
               class="border w-full px-3 py-1.5 h-8 rounded-md text-sm
               shadow-sm focus:outline-slate-900"
               class:border-red-500={!!errors?.url}
-              value={award.url}
-            />
-          </Field>
-
-          <Field label="Country" error={errors?.country_id}>
-            <CountrySelect
-              error={errors?.country_id}
-              country_id={award.country_id ?? ''}
             />
           </Field>
 
@@ -174,7 +93,6 @@
               class="border w-full px-3 py-1.5 rounded-md text-sm
               shadow-sm focus:outline-slate-900 h-20"
               class:border-red-500={!!errors?.description}
-              value={award.description}
             />
           </Field>
 

@@ -166,10 +166,29 @@ CREATE TABLE IF NOT EXISTS awards (
    genre_id TEXT,
    country_id TEXT,
    created_on INTEGER,
-   FOREIGN KEY (genre_id) REFERENCES genres (id) ON DELETE
-   SET NULL,
-      FOREIGN KEY (country_id) REFERENCES countries (id) ON DELETE
-   SET NULL
+   FOREIGN KEY (genre_id) REFERENCES genres (id) ON DELETE SET NULL,
+   FOREIGN KEY (country_id) REFERENCES countries (id) ON DELETE SET NULL
+);
+
+-- DROP TABLE IF EXISTS awards_categories;
+CREATE TABLE IF NOT EXISTS awards_categories (
+   id TEXT PRIMARY KEY,
+   name TEXT,
+   url TEXT,
+   description TEXT,
+   created_on INTEGER
+);
+
+-- DROP TABLE IF EXISTS books_awards;
+CREATE TABLE IF NOT EXISTS books_awards (
+   id TEXT PRIMARY KEY,
+   book_id TEXT,
+   award_id TEXT,
+   award_category_id TEXT,
+   created_on INTEGER,
+   FOREIGN KEY(book_id) REFERENCES books(id) ON DELETE CASCADE,
+   FOREIGN KEY(award_id) REFERENCES awards(id) ON DELETE CASCADE,
+   FOREIGN KEY(award_category_id) REFERENCES award_categoriess(id) ON DELETE CASCADE
 );
 
 -- DROP TABLE IF EXISTS marketplaces;
