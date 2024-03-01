@@ -12,19 +12,17 @@ import {
   omit,
   number,
   optional,
-  url,
-  nullable,
 } from 'valibot'
 
-const AwardCategorySchema = object({
+const AwardLinkingSchema = object({
   id: string([minLength(15, 'ID is required')]),
-  name: string([minLength(4, 'Name is required')]),
-  description: string([minLength(20, 'Must be atleast 20 characters')]),
-  url: string('URL is required', [url('Please provide valid url')]),
+  book_id: string([minLength(15, 'Book is required')]),
+  award_id: string([minLength(15, 'Award is required')]),
+  award_category_id: string([minLength(15, 'Category is required')]),
   created_on: optional(number()),
 })
 
-export type AwardCategory = Required<Output<typeof AwardCategorySchema>>
+export type AwardLinking = Required<Output<typeof AwardLinkingSchema>>
 
 export const POST = createActions({
   add: async ({ locals, request }) => {
@@ -36,7 +34,7 @@ export const POST = createActions({
 
     const formData = await request.formData()
     const data = decode(formData)
-    const result = safeParse(omit(AwardCategorySchema, ['id']), data)
+    const result = safeParse(omit(AwardLinkingSchema, ['id']), data)
 
     if (!result.success) {
       const errors = flatten(result.issues).nested
@@ -46,18 +44,18 @@ export const POST = createActions({
       )
     }
 
-    const award_category: AwardCategory = {
+    const award_category: AwardLinking = {
       id: generateId(15),
-      name: result.output.name,
-      description: result.output.description,
-      url: result.output.url,
+      book_id: result.output.book_id,
+      award_id: result.output.award_id,
+      award_category_id: result.output.award_category_id,
       created_on: Date.now(),
     }
 
     await db
       .prepare(
-        `INSERT INTO awards_categories
-        (id, name, description, url, created_on) 
+        `INSERT INTO books_awards
+        (id, book_id, award_id, award_category_id, created_on) 
         VALUES (?, ?, ?, ?, ?)`
       )
       .bind(...values(award_category))
@@ -77,7 +75,7 @@ export const POST = createActions({
 
     const formData = await request.formData()
     const data = decode(formData)
-    const result = safeParse(AwardCategorySchema, data)
+    const result = safeParse(AwardLinkingSchema, data)
 
     if (!result.success) {
       const errors = flatten(result.issues).nested
@@ -87,16 +85,16 @@ export const POST = createActions({
       )
     }
 
-    const award_category: Omit<AwardCategory, 'id' | 'created_on'> = {
-      name: result.output.name,
-      description: result.output.description,
-      url: result.output.url,
+    const award_category: Omit<AwardLinking, 'id' | 'created_on'> = {
+      book_id: result.output.book_id,
+      award_id: result.output.award_id,
+      award_category_id: result.output.award_category_id,
     }
 
     await db
       .prepare(
-        `UPDATE awards_categories
-        SET name=?, description=?, url=?
+        `UPDATE books_awards
+        SET book_id=?, award_id=?, award_category_id=?
         WHERE id=?`
       )
       .bind(...values(award_category), result.output.id)
@@ -116,7 +114,7 @@ export const POST = createActions({
 
     const formData = await request.formData()
     const data = decode(formData)
-    const result = safeParse(pick(AwardCategorySchema, ['id']), data)
+    const result = safeParse(pick(AwardLinkingSchema, ['id']), data)
 
     if (!result.success) {
       const errors = flatten(result.issues).nested
@@ -127,7 +125,7 @@ export const POST = createActions({
     }
 
     await db
-      .prepare(`DELETE FROM awards_categories WHERE id=?`)
+      .prepare(`DELETE FROM books_awards WHERE id=?`)
       .bind(result.output.id) //
       .run()
 

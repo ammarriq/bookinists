@@ -1,0 +1,37 @@
+---
+import type { Award } from '@/pages/api/award'
+
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import AwardCategory from './_partials/categories.svelte'
+
+const PER_PAGE = 9
+const db = Astro.locals.runtime.env.SITE_DB
+
+const user = Astro.locals.user
+if (!user) return Astro.redirect('/login')
+
+const currentPage = +(Astro.url.searchParams.get('page') || '1')
+
+const getCount = db
+  .prepare('SELECT COUNT(*) AS total FROM awards_categories')
+  .first<number>('total')
+
+const getAwards = db
+  .prepare('SELECT * FROM awards_categories LIMIT ? OFFSET ?')
+  .bind(PER_PAGE, (currentPage - 1) * PER_PAGE)
+  .all<Award>()
+
+const [count, awards] = await Promise.all([getCount, getAwards])
+---
+
+<AdminLayout title="Admin | Bookinists">
+  <main class="px-4 py-6">
+    <AwardCategory
+      categories={awards.results}
+      count={count ?? 0}
+      currentPage={currentPage}
+      perPage={PER_PAGE}
+      client:load
+    />
+  </main>
+</AdminLayout>
