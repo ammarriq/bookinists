@@ -287,7 +287,7 @@
         />
 
         <Dialog.Title class="space-y-1 mb-4">
-          <h2 class="text-base font-semibold">Edit Book</h2>
+          <h2 class="text-base font-semibold">Update Authors</h2>
         </Dialog.Title>
 
         <form

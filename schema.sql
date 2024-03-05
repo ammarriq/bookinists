@@ -215,7 +215,6 @@ CREATE TRIGGER IF NOT EXISTS awards_categories_au AFTER UPDATE ON awards_categor
 CREATE TRIGGER IF NOT EXISTS awards_categories_ad AFTER DELETE ON awards_categories
    BEGIN DELETE FROM awards_categories_fts WHERE id = OLD.id; END;
 
-
 -- DROP TABLE IF EXISTS books_awards;
 CREATE TABLE IF NOT EXISTS books_awards (
    id TEXT PRIMARY KEY,
@@ -251,6 +250,18 @@ CREATE TABLE IF NOT EXISTS storages (
    notes TEXT,
    created_on INTEGER
 );
+
+-- DROP TABLE IF EXISTS storages_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS storages_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS storages_ai AFTER INSERT ON storages
+   BEGIN INSERT INTO storages_fts (id, name) VALUES (NEW.id, NEW.name); END;
+
+CREATE TRIGGER IF NOT EXISTS storages_au AFTER UPDATE ON storages
+   BEGIN UPDATE storages_fts SET name = NEW.name WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS storages_ad AFTER DELETE ON storages
+   BEGIN DELETE FROM storages_fts WHERE id = OLD.id; END;
 
 -- DROP TABLE IF EXISTS editions;
 CREATE TABLE IF NOT EXISTS editions (
@@ -340,15 +351,28 @@ CREATE TABLE IF NOT EXISTS storages_editions (
 CREATE TABLE IF NOT EXISTS rooms (
    id TEXT PRIMARY KEY,
    name TEXT,
-   FLOOR INTEGER,
+   floor INTEGER,
    created_on INTEGER
 );
+
+-- DROP TABLE IF EXISTS rooms_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS rooms_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS rooms_ai AFTER INSERT ON rooms
+   BEGIN INSERT INTO rooms_fts (id, name) VALUES (NEW.id, NEW.name); END;
+
+CREATE TRIGGER IF NOT EXISTS rooms_au AFTER UPDATE ON rooms
+   BEGIN UPDATE rooms_fts SET name = NEW.name WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS rooms_ad AFTER DELETE ON rooms
+   BEGIN DELETE FROM rooms_fts WHERE id = OLD.id; END;
 
 -- DROP TABLE IF EXISTS rooms_storages;
 CREATE TABLE IF NOT EXISTS rooms_storages (
    id TEXT PRIMARY KEY,
    storage_id TEXT,
    room_id TEXT,
+   created_on INTEGER,
    FOREIGN KEY (storage_id) REFERENCES storages (id) ON DELETE
    SET NULL,
       FOREIGN KEY (room_id) REFERENCES rooms (id) ON DELETE
