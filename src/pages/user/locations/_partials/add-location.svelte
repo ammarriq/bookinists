@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements'
-  import type { Location } from '@/pages/api/location'
+  import type { Location } from '@/pages/api/locationindex'
 
   import { fade, fly } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'

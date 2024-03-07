@@ -395,10 +395,9 @@ CREATE TABLE IF NOT EXISTS locations_rooms (
    id TEXT PRIMARY KEY,
    location_id TEXT,
    room_id TEXT,
-   FOREIGN KEY (location_id) REFERENCES locations (id) ON DELETE
-   SET NULL,
-      FOREIGN KEY (room_id) REFERENCES rooms (id) ON DELETE
-   SET NULL
+   created_on INTEGER,
+   FOREIGN KEY (location_id) REFERENCES locations (id) ON DELETE SET NULL,
+   FOREIGN KEY (room_id) REFERENCES rooms (id) ON DELETE SET NULL
 );
 
 -- DROP TABLE IF EXISTS lists;
