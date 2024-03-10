@@ -227,16 +227,6 @@ CREATE TABLE IF NOT EXISTS books_awards (
    FOREIGN KEY(award_category_id) REFERENCES awards_categories(id) ON DELETE CASCADE
 );
 
--- DROP TABLE IF EXISTS marketplaces;
-CREATE TABLE IF NOT EXISTS marketplaces (
-   id TEXT PRIMARY KEY,
-   icon TEXT,
-   name TEXT,
-   url TEXT,
-   description TEXT,
-   created_on INTEGER
-);
-
 -- DROP TABLE IF EXISTS storages;
 CREATE TABLE IF NOT EXISTS storages (
    id TEXT PRIMARY KEY,
@@ -456,4 +446,51 @@ CREATE TABLE IF NOT EXISTS contacts (
    created_on INTEGER,
    FOREIGN KEY (country_id) REFERENCES countries (id) ON DELETE
    SET NULL
+);
+
+-- DROP TABLE IF EXISTS contacts_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS contacts_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS contacts_ai AFTER INSERT ON contacts
+   BEGIN INSERT INTO contacts_fts (id, name) VALUES (NEW.id, NEW.name); END;
+
+CREATE TRIGGER IF NOT EXISTS contacts_au AFTER UPDATE ON contacts
+   BEGIN UPDATE contacts_fts SET name = NEW.name WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS contacts_ad AFTER DELETE ON contacts
+   BEGIN DELETE FROM contacts_fts WHERE id = OLD.id; END;
+
+-- DROP TABLE IF EXISTS marketplaces;
+CREATE TABLE IF NOT EXISTS marketplaces (
+   id TEXT PRIMARY KEY,
+   icon TEXT,
+   name TEXT,
+   url TEXT,
+   description TEXT,
+   created_on INTEGER
+);
+
+-- DROP TABLE IF EXISTS marketplaces_fts;
+CREATE VIRTUAL TABLE IF NOT EXISTS marketplaces_fts USING fts5(id UNINDEXED, name);
+
+CREATE TRIGGER IF NOT EXISTS marketplaces_ai AFTER INSERT ON marketplaces
+   BEGIN INSERT INTO marketplaces_fts (id, name) VALUES (NEW.id, NEW.name); END;
+
+CREATE TRIGGER IF NOT EXISTS marketplaces_au AFTER UPDATE ON marketplaces
+   BEGIN UPDATE marketplaces_fts SET name = NEW.name WHERE id = OLD.id; END;
+
+CREATE TRIGGER IF NOT EXISTS marketplaces_ad AFTER DELETE ON marketplaces
+   BEGIN DELETE FROM marketplaces_fts WHERE id = OLD.id; END;
+
+-- DROP TABLE IF EXISTS contacts_marketplaces;
+CREATE TABLE IF NOT EXISTS contacts_marketplaces (
+   id TEXT PRIMARY KEY,
+   name TEXT,
+   shop_url TEXT,
+   description TEXT,
+   contact_id TEXT,
+   marketplace_id TEXT,
+   created_on INTEGER,
+   FOREIGN KEY (contact_id) REFERENCES contacts(id) ON DELETE  SET NULL,
+   FOREIGN KEY (marketplace_id) REFERENCES marketplaces(id) ON DELETE  SET NULL
 );

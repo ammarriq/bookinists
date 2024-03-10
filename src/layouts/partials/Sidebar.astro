@@ -81,22 +81,28 @@ const userLinks = [
     label: 'Storages',
     href: '/user/storages',
   },
+  {},
+  {
+    icon: 'icon-[tabler--address-book]',
+    label: 'Contacts',
+    href: '/user/contacts',
+  },
   {
     icon: 'icon-[tabler--building-store]',
     label: 'Marketplaces',
     href: '/user/marketplaces',
+  },
+  {
+    icon: 'icon-[tabler--affiliate]',
+    label: 'Contact marketplaces',
+    href: '/user/contact-marketplaces',
   },
   {},
   {
     icon: 'icon-[tabler--flag]',
     label: 'Countries',
     href: '/user/countries',
-  },
-  {
-    icon: 'icon-[tabler--address-book]',
-    label: 'Contacts',
-    href: '/user/contacts',
-  },
+  }
 ]
 
 const navLinks = user?.role === "admin" ? adminLinks.concat(userLinks) : []
